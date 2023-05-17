@@ -1,0 +1,5 @@
+spring:
+  data:
+    mongodb:
+      uri : mongodb+srv://piusudipiuaumentalafreschezza:tecchio@cluster0.qkbape4.mongodb.net/?retryWrites=true&w=majority
+      database: cluster0
