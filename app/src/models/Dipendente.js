@@ -1,8 +1,10 @@
 export default class Dipendente {
-  constructor(nome, cognome, referente, qualifiche, lingue) {
+  constructor(username, password, nome, cognome, role, qualifiche, lingue) {
+    this.username = username;
+    this.password = password
     this.nome = nome;
     this.cognome = cognome;
-    this.referente = referente;
+    this.role = role;
     this.qualifiche = qualifiche;
     this.lingue = lingue;
   }

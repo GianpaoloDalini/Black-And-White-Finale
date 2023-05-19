@@ -19,18 +19,17 @@ public class AuthenticationService {
   private final AuthenticationManager authenticationManager;
   
   public AuthenticationResponse authenticate(AuthenticationRequest request) {
-    log.info("MANNAGGIA");
+    log.info("Attempting authentication");
     authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(
             request.getUsername(),
             request.getPassword()
         )
     );
-    log.info("CRISTO");
+    log.info("pppp trovato");
     var user = repository.findByUsername(request.getUsername())
         .orElseThrow(() -> new RuntimeException("Utente non trovato"));
 
-  
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
             .id(user.getId())

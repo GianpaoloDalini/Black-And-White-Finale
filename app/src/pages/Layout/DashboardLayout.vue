@@ -8,9 +8,7 @@
       :sidebar-item-color="sidebarBackground"
       :sidebar-background-image="sidebarBackgroundImage"
     >
-      <!-- Menu mobile -->
-      <mobile-menu slot="content"></mobile-menu>
-
+      
       <!-- Link alla dashboard -->
       <sidebar-link to="/dashboard">
         <md-icon>home</md-icon>
@@ -42,8 +40,6 @@
         <p>Ore</p>
       </sidebar-link>
 
-  
-
       <!-- Link al calendario -->
       <sidebar-link to="/calendario">
         <md-icon>calendar_today</md-icon>
@@ -53,18 +49,8 @@
 
     <!-- Pannello principale -->
     <div class="main-panel">
-      <!-- Barra superiore -->
-      <top-navbar></top-navbar>
-
-      <!-- Plugin aggiuntivo -->
-      <fixed-plugin
-        :color.sync="sidebarBackground"
-        :image.sync="sidebarBackgroundImage"
-      >
-      </fixed-plugin>
-
       <!-- Contenuto della dashboard -->
-      <dashboard-content> </dashboard-content>
+      <router-view></router-view>
 
       <!-- Footer del contenuto -->
       <content-footer v-if="!$route.meta.hideFooter"></content-footer>
@@ -74,14 +60,10 @@
 
 <script>
 import ContentFooter from "./ContentFooter.vue";
-import DashboardContent from "./Content.vue";
-import MobileMenu from "@/pages/Layout/MobileMenu.vue";
 
 export default {
   components: {
-    DashboardContent,
     ContentFooter,
-    MobileMenu,
   },
   data() {
     return {

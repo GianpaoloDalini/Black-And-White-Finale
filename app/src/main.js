@@ -34,6 +34,7 @@ import Chartist from "chartist";
 // configure router
 const router = new VueRouter({
   routes, // short for routes: routes
+  mode: 'history',
   linkExactActiveClass: "nav-item active",
 });
 
@@ -44,6 +45,27 @@ Vue.use(MaterialDashboard);
 Vue.use(GlobalComponents);
 Vue.use(GlobalDirectives);
 Vue.use(Notifications);
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token');
+  const isAuthenticated = !!token;
+
+  if (to.matched.some(route => route.meta.requiresAuth)) {
+    if (!isAuthenticated) {
+      next({ path: '/login' }); // Reindirizza alla pagina di login
+    } else {
+      next(); // Procedi alla navigazione normale
+    }
+  } else {
+    if (isAuthenticated && to.path === '/login') {
+      next({ path: '/dashboard' }); // Reindirizza alla dashboard se l'utente è già autenticato e cerca di accedere alla pagina di login
+    } else {
+      next(); // Procedi alla navigazione normale
+    }
+  }
+});
+
+
 
 /* eslint-disable no-new */
 new Vue({

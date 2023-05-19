@@ -7,8 +7,21 @@
       </div>
 
       <!-- Form -->
+      <!-- Form -->
       <div class="form-group">
         <div class="form form-inline">
+          <!-- Username -->
+          <label for="username" class="label">Username:</label>
+          <div class="input-wrapper">
+            <input type="text" id="username" class="input" v-model="username" />
+          </div>
+
+          <!-- Password -->
+          <label for="password" class="label">Password:</label>
+          <div class="input-wrapper">
+            <input type="password" id="password" class="input" v-model="password" />
+          </div>
+
           <!-- Nome -->
           <label for="name" class="label">Nome:</label>
           <div class="input-wrapper">
@@ -31,23 +44,23 @@
             <label class="label">Qualifiche:</label>
             <div class="checkbox">
               <input type="checkbox" id="BAR" v-model="qualifiche.BAR" />
-              <label for="bar">Bar</label>
+              <label for="BAR">Bar</label>
             </div>
             <div class="checkbox">
               <input type="checkbox" id="SALA" v-model="qualifiche.SALA" />
-              <label for="sala">Sala</label>
+              <label for="SALA">Sala</label>
             </div>
             <div class="checkbox">
               <input type="checkbox" id="CUCINA" v-model="qualifiche.CUCINA" />
-              <label for="cucina">Cucina</label>
+              <label for="CUCINA">Cucina</label>
             </div>
             <div class="checkbox">
               <input type="checkbox" id="AUTOMUNITO" v-model="qualifiche.AUTOMUNITO" />
-              <label for="automunito">Automunito</label>
+              <label for="AUTOMUNITO">Automunito</label>
             </div>
             <div class="checkbox">
               <input type="checkbox" id="REFERENTE" v-model="referente" />
-              <label for="referente">Referente</label>
+              <label for="REFERENTE">Referente</label>
             </div>
           </div>
         </div>
@@ -188,9 +201,11 @@ import Dipendente from "@/models/Dipendente.js";
 export default {
   data() {
     return {
+      username: "", // Variabile per lo username del dipendente
+      password: "", // Variabile per la password del dipendente
       nome: "", // Variabile per il nome del dipendente
       cognome: "", // Variabile per il cognome del dipendente
-      referente: false, // Variabile per il referente del dipendente
+      role: false, // Variabile per il referente del dipendente
       mostraConferma: false, // Variabile per mostrare/nascondere il messaggio di conferma
       qualifiche: {
         AUTOMUNITO: false, // Valore booleano per la qualifica 'automunito'
@@ -206,11 +221,12 @@ export default {
         // Aggiungi altre lingue qui
       },
     };
-
   },
   methods: {
     inviaDati() {
-      // Creazione di un nuovo oggetto Dipendente con i valori correnti di nome e cognome
+      const role = this.referente ? "REFERENTE" : "DIPENDENTE";
+
+      // Creazione di un nuovo oggetto Dipendente con i valori correnti
       const lingueSelezionate = Object.keys(this.lingue).filter(
         (l) => this.lingue[l]
       );
@@ -218,27 +234,47 @@ export default {
         (l) => this.qualifiche[l]
       );
 
-      const dipendente = new Dipendente(
-  this.nome,
-  this.cognome,
-  this.referente,
-  qualificheSelezionate,
-  lingueSelezionate
-);
+      const dipendente = {
+        username: this.username,
+        password: this.password,
+        nome: this.nome,
+        cognome: this.cognome,
+        role: role,
+        qualifiche: qualificheSelezionate,
+        lingue: lingueSelezionate,
+      };
 
+      // Effettua la richiesta POST al server
+      const token = localStorage.getItem("token");
 
-      // Invio dei dati al server
-      fetch("http://localhost:8080/dipendente", {
+      const requestOptions = {
         method: "POST",
-        body: JSON.stringify(dipendente),
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      });
+        body: JSON.stringify(dipendente),
+      };
 
-      // Aggiungi qui il codice per gestire la risposta del server, se necessario
+      fetch("http://localhost:8080/dipendente", requestOptions)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Errore durante la richiesta");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log("Dipendente aggiunto:", data);
+          // Gestisci la risposta del server se necessario
+        })
+        .catch((error) => {
+          console.error("Errore durante la richiesta:", error);
+          // Gestisci l'errore se necessario
+        });
 
       // Resettare i valori del form
+      this.username = "";
+      this.password = "";
       this.nome = "";
       this.cognome = "";
 
@@ -247,4 +283,5 @@ export default {
     },
   },
 };
+
 </script>
