@@ -245,7 +245,7 @@ export default {
       };
 
       // Effettua la richiesta POST al server
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       const requestOptions = {
         method: "POST",
