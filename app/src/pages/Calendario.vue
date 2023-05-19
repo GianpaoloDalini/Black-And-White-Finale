@@ -12,13 +12,14 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="week in calendar" :key="week">
-          <td v-for="date in week" :key="date.date" :class="getCellClasses(date)" @click="changeColor(date)">
-            <div class="date">{{ date.date }}</div>
-            <div class="color-marker" :class="date.color"></div>
-          </td>
-        </tr>
-      </tbody>
+  <tr v-for="(week, index) in calendar" :key="index">
+    <td v-for="date in week" :key="date.date" :class="getCellClasses(date)" @click="changeColor(date)">
+      <div class="date">{{ date.date }}</div>
+      <div class="color-marker" :class="date.color"></div>
+    </td>
+  </tr>
+</tbody>
+
     </table>
   </div>
 </template>

@@ -61,131 +61,24 @@
         </table>
       </div>
     </div>
-       <!-- Spazio per scorrere -->
-  <div style="height: 1000px;"></div>
+    <!-- Spazio per scorrere -->
+    <div style="height: 1000px;"></div>
   </div>
 </template>
 
 <style>
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 5px;
-  background-color: #f9f9f9;
-  border-radius: 5px;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.left-column,
-.right-column {
-  flex: 1;
-  padding: 10px;
-}
-
-.title {
-  margin-bottom: 10px;
-}
-
-.form-container {
-  padding: 10px;
-  margin-bottom: 20px;
-}
-
-.form-group {
-  padding: 10px;
-  margin-bottom: 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-.label {
-  display: block;
-  font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.input-wrapper {
-  display: flex;
-  align-items: center;
-}
-
-.button-delete {
-  background-color: red;
-}
-
-.input {
-  width: 100%;
-  height: 40px;
-  padding: 5px 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.textarea {
-  width: 100%;
-  min-height: 100px;
-  padding: 5px 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.button {
-  padding: 10px 50px;
-  background-color: #4caf50;
-  color: #fff;
-  font-size: 16px;
-  font-weight: bold;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.conferma {
-  display: inline-block;
-  margin-left: 10px;
-  font-size: 14px;
-  color: green;
-  margin-top: 10px;
-}
-
-.table-container {
-  width: 100%;
-  padding: 10px;
-  overflow: auto;
-}
-
-.clienti-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.clienti-table th,
-.clienti-table td {
-  padding: 10px;
-  border: 1px solid #ccc;
-  text-align: left;
-}
-
-.clienti-table th {
-  background-color: #f2f2f2;
-  font-weight: bold;
-}
-
-.clienti-table td {
-  font-size: 14px;
-}
+/* Stili CSS */
 </style>
 
-
 <script>
-import Cliente from "@/models/Cliente.js";
+import axios from "axios";
+
+const axiosInstance = axios.create({
+  baseURL: "http://localhost:8080/api/v1",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 export default {
   data() {
@@ -193,82 +86,71 @@ export default {
       nome: "",
       descrizione: "",
       mostraConferma: false,
-    
-    
-      // parte del delte 
       clienteId: "",
       mostraEliminaConferma: false,
-
-      //lista clienti
-      clienti: [], // Aggiunta della lista dei clienti
+      clienti: [],
     };
   },
   methods: {
     inviaDati() {
-      const cliente = new Cliente(this.nome, this.descrizione);
+      const cliente = {
+        nome: this.nome,
+        descrizione: this.descrizione,
+      };
 
-      // Invio dei dati al server
-      fetch("http://localhost:8080/cliente", {
-        method: "POST",
-        body: JSON.stringify(cliente),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      // Resetta i campi del form dopo l'invio dei dati
-      this.nome = "";
-      this.descrizione = "";
-      
-      // Mostrare il messaggio di conferma
-      this.mostraConferma = true;
+      axiosInstance.post("/clienti/addcliente", cliente)
+        .then(response => {
+          // Resetta i campi del form dopo l'invio dei dati
+          this.nome = "";
+          this.descrizione = "";
 
-      // Caricamento dei clienti dopo l'aggiunta di un nuovo cliente
-      this.caricaClienti();
+          // Mostra il messaggio di conferma
+          this.mostraConferma = true;
+
+          // Carica i clienti dopo l'aggiunta di un nuovo cliente
+          this.caricaClienti();
+        })
+        .catch(error => {
+          console.error("Errore durante l'invio dei dati:", error);
+        });
     },
 
     eliminaCliente() {
-      // Invio della richiesta di eliminazione al server
-      fetch(`http://localhost:8080/cliente/${this.clienteId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }).then(response => {
-        if (response.ok) {
-          // Cliente eliminato con successo
-          this.mostraEliminaConferma = true;
-        } else {
-          // Gestione dell'errore in caso di fallimento dell'eliminazione
-          // Puoi mostrare un messaggio di errore o fare altre azioni
-        }
-      });
+      axiosInstance.delete(`/clienti/deletecliente/${this.clienteId}`)
+        .then(response => {
+          if (response.status === 200) {
+            // Cliente eliminato con successo
+            this.mostraEliminaConferma = true;
 
-      // Resetta il campo ID dopo l'eliminazione del cliente
-      this.clienteId = "";
+            // Resetta il campo ID dopo l'eliminazione del cliente
+            this.clienteId = "";
 
-      // Caricamento dei clienti dopo l'aggiunta di un nuovo cliente
-      this.caricaClienti();
+            // Carica i clienti dopo l'eliminazione di un cliente
+            this.caricaClienti();
+          } else {
+            // Gestione dell'errore in caso di fallimento dell'eliminazione
+            // Puoi mostrare un messaggio di errore o fare altre azioni
+          }
+        })
+        .catch(error => {
+          console.error("Errore durante l'eliminazione del cliente:", error);
+        });
     },
 
     caricaClienti() {
-      fetch("http://localhost:8080/clienti")
-        .then(response => response.json())
-        .then(data => {
-          this.clienti = data;
+      axiosInstance.get("/clienti/getallclienti")
+        .then(response => {
+          this.clienti = response.data;
         })
         .catch(error => {
           console.error("Errore durante il recupero dei clienti:", error);
         });
     },
-
-
-
   },
 
   mounted() {
-    // Caricamento dei clienti al caricamento della pagina
+    // Carica i clienti al caricamento della pagina
     this.caricaClienti();
   },
-
 };
 </script>

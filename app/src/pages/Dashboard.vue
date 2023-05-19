@@ -21,9 +21,6 @@
             <h4 class="title">Prossimi Eventi</h4>
             <p class="category">New employees on 15th September, 2016</p>
           </md-card-header>
-          <md-card-content>
-            <ordered-table table-header-color="orange"></ordered-table>
-          </md-card-content>
         </md-card>
       </div>
       <div
@@ -34,14 +31,4 @@
 </template>
 
 <script>
-import { OrderedTable } from "@/components";
-
-export default {
-  components: {
-    OrderedTable,
-  },
-  data() {
-    return {};
-  },
-};
 </script>

@@ -196,6 +196,7 @@
 </style>
 
 <script>
+import axiosInstance from "@/assets/api.js";
 import Dipendente from "@/models/Dipendente.js";
 
 export default {
@@ -205,7 +206,7 @@ export default {
       password: "", // Variabile per la password del dipendente
       nome: "", // Variabile per il nome del dipendente
       cognome: "", // Variabile per il cognome del dipendente
-      role: false, // Variabile per il referente del dipendente
+      referente: false, // Variabile per il referente del dipendente
       mostraConferma: false, // Variabile per mostrare/nascondere il messaggio di conferma
       qualifiche: {
         AUTOMUNITO: false, // Valore booleano per la qualifica 'automunito'
@@ -244,33 +245,19 @@ export default {
         lingue: lingueSelezionate,
       };
 
-      // Effettua la richiesta POST al server
-      const token = sessionStorage.getItem("token");
+      // Effettua la richiesta POST al server utilizzando Axios
+     // Effettua la richiesta POST al server utilizzando l'istanza di Axios
+axiosInstance
+  .post("/api/v1/dipendenti/adddipendente", dipendente)
+  .then((response) => {
+    console.log("Dipendente aggiunto:", response.data);
+    // Gestisci la risposta del server se necessario
+  })
+  .catch((error) => {
+    console.error("Errore durante la richiesta:", error);
+    // Gestisci l'errore se necessario
+  });
 
-      const requestOptions = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(dipendente),
-      };
-
-      fetch("http://localhost:8080/dipendente", requestOptions)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Errore durante la richiesta");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          console.log("Dipendente aggiunto:", data);
-          // Gestisci la risposta del server se necessario
-        })
-        .catch((error) => {
-          console.error("Errore durante la richiesta:", error);
-          // Gestisci l'errore se necessario
-        });
 
       // Resettare i valori del form
       this.username = "";
