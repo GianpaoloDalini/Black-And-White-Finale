@@ -6,15 +6,14 @@
     </div>
 
     <div class="form-group">
-  <label for="cliente" class="label">Cliente:</label>
-  <div>
-    <select id="cliente" class="input" v-model="cliente">
-      <option value="" disabled selected>&lt;seleziona il cliente&gt;</option>
-      <option v-for="cliente in clientiDisponibili" :key="cliente.id" :value="cliente.id">{{ cliente.nome }}</option>
-    </select>
-  </div>
-</div>
-
+      <label for="cliente" class="label">Cliente:</label>
+      <div>
+        <select id="cliente" class="input" v-model="cliente">
+          <option value="" disabled selected>&lt;seleziona il cliente&gt;</option>
+          <option v-for="cliente in clientiDisponibili" :key="cliente.id" :value="cliente.id">{{ cliente.nome }}</option>
+        </select>
+      </div>
+    </div>
 
     <div class="form-group">
       <label for="data" class="label">Data:</label>
@@ -57,11 +56,9 @@
     <button class="button" @click="inviaDati">Conferma</button>
     <span v-if="mostraConferma" class="conferma">Evento aggiunto correttamente!</span>
 
-      <!-- Spazio per scorrere -->
-  <div style="height: 1000px;"></div>
+    <!-- Spazio per scorrere -->
+    <div style="height: 1000px;"></div>
   </div>
-
-  
 </template>
 
 <style>
@@ -150,139 +147,99 @@
   margin-top: 10px;
 }
 </style>
+
 <script>
-import Evento from "@/models/Evento.js";
+import axios from "axios";
+
+const axiosInstance = axios.create({
+  baseURL: "http://localhost:8080/api/v1",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 export default {
   data() {
     return {
-      cliente: "",
-      data: "",
-      luogo: "",
+      nome: "",
       descrizione: "",
-      isFesta: false,
-      dipendenti: [],
+      clienteId: "",
+      dipendenteId: "",
       mostraConferma: false,
-      eventi: [], // Array degli eventi
-      clienti: [], // Array dei clienti disponibili
-      dipendentiDisponibili: [], // Array dei dipendenti disponibili
-      clientiDisponibili: [], // Array di clienti disponibili
-   
+      eventi: [],
+      clientiDisponibili: [],
+      dipendentiDisponibili: [],
+      cliente: "", // Aggiungi questa linea
     };
   },
-  created() {
-
-    // Recupera la lista dei dipendenti clienti
-    this.fetchClienti();
-  
-    // Recupera la lista dei dipendenti disponibili
-    this.fetchDipendenti();
-
-    // Recupera la lista degli eventi
-    this.fetchEventi();
-  },
   methods: {
-    fetchClienti() {
-      // Effettua la richiesta al server per ottenere la lista dei clienti
-      fetch("http://localhost:8080/clienti")
-        .then((response) => response.json())
-        .then((data) => {
-          this.clientiDisponibili = data;
+    aggiungiEvento() {
+      const evento = {
+        nome: this.nome,
+        descrizione: this.descrizione,
+        clienteId: this.clienteId,
+        dipendenteId: this.dipendenteId,
+      };
+
+      axiosInstance.post("/eventi", evento)
+        .then(response => {
+          // Resetta i campi del form dopo l'invio dei dati
+          this.nome = "";
+          this.descrizione = "";
+          this.clienteId = "";
+          this.dipendenteId = "";
+
+          // Mostra il messaggio di conferma
+          this.mostraConferma = true;
+
+          // Carica gli eventi dopo l'aggiunta di un nuovo evento
+          this.caricaEventi();
         })
-        .catch((error) => {
-          console.error("Errore durante il recupero dei clienti:", error);
+        .catch(error => {
+          console.error("Errore durante l'invio dei dati:", error);
         });
     },
-    fetchDipendenti() {
-      // Effettua la richiesta al server per ottenere la lista dei dipendenti
-      fetch("http://localhost:8080/dipendenti")
-        .then((response) => response.json())
-        .then((data) => {
-          this.dipendentiDisponibili = data;
+
+    caricaEventi() {
+      axiosInstance.get("/eventi")
+        .then(response => {
+          this.eventi = response.data;
         })
-        .catch((error) => {
-          console.error("Errore durante il recupero dei dipendenti:", error);
-        });
-    },
-    fetchEventi() {
-      // Effettua la richiesta al server per ottenere la lista degli eventi
-      fetch("http://localhost:8080/eventi")
-        .then((response) => response.json())
-        .then((data) => {
-          this.eventi = data;
-        })
-        .catch((error) => {
+        .catch(error => {
           console.error("Errore durante il recupero degli eventi:", error);
         });
     },
-    inviaDati() {
-      const evento = new Evento(
-        this.cliente,
-        this.data,
-        this.luogo,
-        this.descrizione,
-        this.isFesta,
-        this.dipendenti
-      );
 
-      // Invio dei dati al server
-      fetch("http://localhost:8080/evento", {
-        method: "POST",
-        body: JSON.stringify(evento),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((response) => {
-          if (response.ok) {
-            // Evento aggiunto con successo
-            this.mostraConferma = true;
-            // Aggiorna la lista degli eventi
-            this.fetchEventi();
-          } else {
-            // Gestione dell'errore in caso di fallimento dell'aggiunta
-            // Puoi mostrare un messaggio di errore o fare altre azioni
-          }
+    caricaClientiDisponibili() {
+      axiosInstance.get("/clienti/getallclienti")
+        .then(response => {
+          this.clientiDisponibili = response.data;
         })
-        .catch((error) => {
-          console.error("Errore durante l'invio dei dati evento:", error);
+        .catch(error => {
+          console.error("Errore durante il recupero dei clienti:", error);
         });
-
-      // Resetta i campi del form dopo l'invio dei dati
-      this.cliente = "";
-      this.data = "";
-      this.luogo = "";
-      this.descrizione = "";
-      this.isFesta = false;
-      this.dipendenti = [];
     },
-    eliminaEvento() {
-      // Invio della richiesta di eliminazione al server
-      fetch(`http://localhost:8080/evento/${this.eventoId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((response) => {
-          if (response.ok) {
-            // Evento eliminato con successo
-            this.mostraEliminaConferma = true;
-            // Aggiorna la lista degli eventi
-            this.fetchEventi();
-          } else {
-            // Gestione dell'errore in caso di fallimento dell'eliminazione
-            // Puoi mostrare un messaggio di errore o fare altre azioni
-          }
+
+    caricaDipendentiDisponibili() {
+      axiosInstance.get("/dipendenti")
+        .then(response => {
+          this.dipendentiDisponibili = response.data;
         })
-        .catch((error) => {
-          console.error("Errore durante l'eliminazione dell'evento:", error);
+        .catch(error => {
+          console.error("Errore durante il recupero dei dipendenti:", error);
         });
-
-      // Resetta il campo ID dopo l'eliminazione dell'evento
-      this.eventoId = "";
     },
+  },
+
+  mounted() {
+    // Carica gli eventi al caricamento della pagina
+    this.caricaEventi();
+
+    // Carica i clienti disponibili
+    this.caricaClientiDisponibili();
+
+    // Carica i dipendenti disponibili
+    this.caricaDipendentiDisponibili();
   },
 };
 </script>
-
