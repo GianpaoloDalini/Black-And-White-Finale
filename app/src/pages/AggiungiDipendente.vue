@@ -95,8 +95,6 @@
 
     <!-- Clearfix per pulire il float -->
     <div class="clearfix"></div>
-     <!-- Spazio per scorrere -->
-     <div style="height: 1000px;"></div>
   </div>
 </template>
 
