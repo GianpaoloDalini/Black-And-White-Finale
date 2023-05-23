@@ -1,9 +1,9 @@
 import DashboardLayout from "@/pages/Layout/DashboardLayout.vue";
 import Dashboard from "@/pages/Dashboard.vue";
 import UserProfile from "@/pages/UserProfile.vue";
-import AggiungiDipendente from "@/pages/AggiungiDipendente.vue";
+import GestisciDipendenti from "@/pages/GestisciDipendenti.vue";
 import AggiungiEvento from "@/pages/AggiungiEvento.vue";
-import AggiungiCliente from "@/pages/AggiungiCliente.vue";
+import GestisciClienti from "@/pages/GestisciClienti.vue";
 import AggiungiDate from "@/pages/AggiungiDate.vue";
 import Ore from "@/pages/Ore.vue";
 import Calendario from "@/pages/Calendario.vue";
@@ -43,9 +43,9 @@ const routes = [
         },
       },
       {
-        path: "aggiungidipendente",
-        name: "Aggiungi Dipendente",
-        component: AggiungiDipendente,
+        path: "gestiscidipendenti",
+        name: "Gestisci Dipendenti",
+        component: GestisciDipendenti,
         meta: {
           requiresAuth: true,
         },
@@ -83,9 +83,9 @@ const routes = [
         },
       },
       {
-        path: "aggiungicliente",
-        name: "Aggiungi Cliente",
-        component: AggiungiCliente,
+        path: "gestisciclienti",
+        name: "Gestisci Clienti",
+        component: GestisciClienti,
         meta: {
           requiresAuth: true,
         },

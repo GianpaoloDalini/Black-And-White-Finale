@@ -17,15 +17,15 @@
 
 
       <!-- Link per aggiungere un dipendente -->
-      <sidebar-link to="/aggiungidipendente">
+      <sidebar-link to="/gestiscidipendenti">
         <md-icon>person_add</md-icon>
-        <p>Aggiungi Dipendente</p>
+        <p>Gestisci Dipendenti</p>
       </sidebar-link>
 
       <!-- Link per aggiungere un cliente -->
-      <sidebar-link to="/aggiungicliente">
+      <sidebar-link to="/gestisciclienti">
         <md-icon>food_bank</md-icon>
-        <p>Aggiungi Cliente</p>
+        <p>Gestisci Clienti</p>
       </sidebar-link>
 
        <!-- Link per aggiungere un cliente -->
