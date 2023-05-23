@@ -184,7 +184,7 @@ export default {
   methods: {
     fetchClienti() {
       // Effettua la richiesta al server per ottenere la lista dei clienti
-      fetch("http://localhost:8080/clienti")
+      fetch("http://localhost:8080/api/v1/clienti/getallclienti")
         .then((response) => response.json())
         .then((data) => {
           this.clientiDisponibili = data;
@@ -195,7 +195,7 @@ export default {
     },
     fetchDipendenti() {
       // Effettua la richiesta al server per ottenere la lista dei dipendenti
-      fetch("http://localhost:8080/dipendenti")
+      fetch("http://localhost:8080/api/v1/dipendenti/getalldipendenti")
         .then((response) => response.json())
         .then((data) => {
           this.dipendentiDisponibili = data;
@@ -206,7 +206,7 @@ export default {
     },
     fetchEventi() {
       // Effettua la richiesta al server per ottenere la lista degli eventi
-      fetch("http://localhost:8080/eventi")
+      fetch("http://localhost:8080/api/v1/eventi/getalleventi")
         .then((response) => response.json())
         .then((data) => {
           this.eventi = data;
@@ -226,7 +226,7 @@ export default {
       );
 
       // Invio dei dati al server
-      fetch("http://localhost:8080/evento", {
+      fetch("http://localhost:8080/api/v1/eventi/addevento", {
         method: "POST",
         body: JSON.stringify(evento),
         headers: {
@@ -258,7 +258,7 @@ export default {
     },
     eliminaEvento() {
       // Invio della richiesta di eliminazione al server
-      fetch(`http://localhost:8080/evento/${this.eventoId}`, {
+      fetch(`http://localhost:8080/api/v1/eventi/deleteevento/${this.eventoId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

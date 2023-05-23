@@ -19,7 +19,7 @@ export default {
       username: "",
       password: "",
       errorMessage: "",
-      token: sessionStorage.getItem("token") || "", // Recupera il token dal sessionStorage se presente
+      token: localStorage.getItem("token") || "", // Recupera il token dal localStorage se presente
     };
   },
   methods: {
@@ -34,8 +34,8 @@ export default {
         .then((response) => response.json())
         .then((data) => {
           if (data.token) {
-            // Salva il token nel sessionStorage
-            sessionStorage.setItem("token", data.token);
+            // Salva il token nel localStorage
+            localStorage.setItem("token", data.token);
             this.token = data.token; // Aggiorna la proprietà 'token'
 
             this.$router.replace('/dashboard');

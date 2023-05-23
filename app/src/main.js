@@ -47,7 +47,7 @@ Vue.use(GlobalDirectives);
 Vue.use(Notifications);
 
 router.beforeEach((to, from, next) => {
-  const token = sessionStorage.getItem('token');
+  const token = localStorage.getItem('token');
   const isAuthenticated = !!token;
 
   if (to.matched.some(route => route.meta.requiresAuth)) {

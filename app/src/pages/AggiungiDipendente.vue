@@ -196,33 +196,32 @@
 </style>
 
 <script>
-import axiosInstance from "@/assets/api.js";
 import Dipendente from "@/models/Dipendente.js";
 
 export default {
   data() {
-    return {
-      username: "", // Variabile per lo username del dipendente
-      password: "", // Variabile per la password del dipendente
-      nome: "", // Variabile per il nome del dipendente
-      cognome: "", // Variabile per il cognome del dipendente
-      referente: false, // Variabile per il referente del dipendente
-      mostraConferma: false, // Variabile per mostrare/nascondere il messaggio di conferma
-      qualifiche: {
-        AUTOMUNITO: false, // Valore booleano per la qualifica 'automunito'
-        BAR: false, // Valore booleano per la qualifica 'bar'
-        SALA: false, // Valore booleano per la qualifica 'sala'
-        CUCINA: false, // Valore booleano per la qualifica 'cucina'
-      },
-      lingue: {
-        INGLESE: false, // Valore booleano per la lingua 'inglese'
-        FRANCESE: false, // Valore booleano per la lingua 'francese'
-        SPAGNOLO: false, // Valore booleano per la lingua 'spagnolo'
-        TEDESCO: false, // Valore booleano per la lingua 'tedesco'
-        // Aggiungi altre lingue qui
-      },
-    };
-  },
+  return {
+    username: "",
+    password: "",
+    nome: "",
+    cognome: "",
+    referente: false, // Cambia il nome della variabile in "referente"
+    mostraConferma: false,
+    qualifiche: {
+      AUTOMUNITO: false,
+      BAR: false,
+      SALA: false,
+      CUCINA: false,
+    },
+    lingue: {
+      INGLESE: false,
+      FRANCESE: false,
+      SPAGNOLO: false,
+      TEDESCO: false,
+    },
+  };
+},
+
   methods: {
     inviaDati() {
       const role = this.referente ? "REFERENTE" : "DIPENDENTE";
@@ -245,19 +244,33 @@ export default {
         lingue: lingueSelezionate,
       };
 
-      // Effettua la richiesta POST al server utilizzando Axios
-     // Effettua la richiesta POST al server utilizzando l'istanza di Axios
-axiosInstance
-  .post("/api/v1/dipendenti/adddipendente", dipendente)
-  .then((response) => {
-    console.log("Dipendente aggiunto:", response.data);
-    // Gestisci la risposta del server se necessario
-  })
-  .catch((error) => {
-    console.error("Errore durante la richiesta:", error);
-    // Gestisci l'errore se necessario
-  });
+      // Effettua la richiesta POST al server
+      const token = localStorage.getItem("token");
 
+      const requestOptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(dipendente),
+      };
+
+      fetch("http://localhost:8080/api/v1/dipendenti/adddipendente", requestOptions)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Errore durante la richiesta");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log("Dipendente aggiunto:", data);
+          // Gestisci la risposta del server se necessario
+        })
+        .catch((error) => {
+          console.error("Errore durante la richiesta:", error);
+          // Gestisci l'errore se necessario
+        });
 
       // Resettare i valori del form
       this.username = "";
