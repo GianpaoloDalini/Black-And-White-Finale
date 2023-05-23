@@ -203,7 +203,7 @@ export default {
       const cliente = new Cliente(this.nome, this.descrizione);
 
       // Prendi il token dalla sessionStorage
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       // Invio dei dati al server
       fetch("http://localhost:8080/api/v1/clienti/addcliente", {
@@ -226,7 +226,7 @@ export default {
 
     eliminaCliente() {
       // Prendi il token dalla sessionStorage
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       // Invio della richiesta di eliminazione al server
       fetch(`http://localhost:8080/api/v1/clienti/deletecliente/${this.clienteId}`, {
@@ -253,7 +253,7 @@ export default {
 
     caricaClienti() {
       // Prendi il token dalla sessionStorage
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       fetch("http://localhost:8080/api/v1/clienti/getallclienti", {
         headers: {
