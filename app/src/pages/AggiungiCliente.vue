@@ -229,7 +229,7 @@ export default {
       const token = localStorage.getItem("token");
 
       // Invio della richiesta di eliminazione al server
-      fetch(`http://localhost:8080/api/v1/clienti/deletecliente/${this.clienteId}}`, {
+      fetch(`http://localhost:8080/api/v1/clienti/deletecliente/${this.clienteId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -240,8 +240,7 @@ export default {
           // Cliente eliminato con successo
           this.mostraEliminaConferma = true;
         } else {
-          // Gestione dell'errore in caso di fallimento dell'eliminazione
-          // Puoi mostrare un messaggio di errore o fare altre azioni
+          console.log("errore nell'eliminazione");
         }
       });
 
