@@ -25,13 +25,23 @@ public class Dipendente implements UserDetails {
     private String role;
     private String nome;
     private String cognome;
+    private String[] lingue;
+    private String[] qualifiche;
 
-    public Dipendente(String username, String password, Role role, String nome, String cognome) {
+    public Dipendente(String username, String password, Role role, String nome, String cognome, Lingua[] lingue, Qualifica[] qualifiche) {
         this.username = username;
         this.password = password;
         this.role = role.name();
         this.nome = nome;
         this.cognome = cognome;
+        for (int i = 0; i < lingue.length; i++) {
+            this.lingue[i] = lingue[i].name();
+        }
+
+        this.qualifiche = new String[qualifiche.length];
+        for (int i = 0; i < qualifiche.length; i++) {
+            this.qualifiche[i] = qualifiche[i].name();
+        }
     }
 
     public String getId() {
@@ -76,6 +86,20 @@ public class Dipendente implements UserDetails {
 
     public String getRole() {
         return role;
+    }
+
+    public void seQualifiche(String[] qualifiche) {
+        this.qualifiche = qualifiche;
+    }
+    public String[] getQualifiche() {
+        return qualifiche;
+    }
+
+    public void setLingue(String[] lingue) {
+        this.lingue = lingue;
+    }
+    public String[] getLingue() {
+        return lingue;
     }
 
     public void setRole(String role) {
