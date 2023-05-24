@@ -52,19 +52,13 @@
       <!-- Contenuto della dashboard -->
       <router-view></router-view>
 
-      <!-- Footer del contenuto -->
-      <content-footer v-if="!$route.meta.hideFooter"></content-footer>
     </div>
   </div>
 </template>
 
 <script>
-import ContentFooter from "./ContentFooter.vue";
 
 export default {
-  components: {
-    ContentFooter,
-  },
   data() {
     return {
       sidebarBackground: "green",
