@@ -7,7 +7,12 @@ import java.util.UUID;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Document(collection = "eventi")
+@Getter
+@Setter
 public class Evento {
 
     @Id
@@ -31,10 +36,7 @@ public class Evento {
 
     // Genera un ID alfanumerico UUID di 6 cifre
     private String generateRandomId() {
-        String uuid = UUID.randomUUID().toString().replace("-", "").substring(0, 6);
-        return uuid;
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 6);
     }
-
-    // getters and setters omitted for brevity
 
 }
