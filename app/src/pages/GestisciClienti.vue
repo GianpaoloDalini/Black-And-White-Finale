@@ -25,23 +25,13 @@
         <button class="button" @click="inviaDati">Conferma</button>
         <span v-if="mostraConferma" class="conferma">Cliente aggiunto correttamente!</span>
       </div>
-
-      <!-- Form di Eliminazione Cliente -->
-      <div class="form-container">
-        <div class="form-group">
-          <label for="clienteId" class="label">ID Cliente:</label>
-          <div class="input-wrapper">
-            <input type="text" id="clienteId" class="input" v-model="clienteId" />
-          </div>
-        </div>
-
-        <button class="button button-delete" style="background-color: red;" @click="eliminaCliente">Elimina Cliente</button>
-        <span v-if="mostraEliminaConferma" class="conferma">Cliente eliminato correttamente!</span>
-      </div>
     </div>
 
     <div class="right-column">
+
       <!-- Tabella dei clienti -->
+    
+
       <div class="table-container">
         <table class="clienti-table">
           <thead>
@@ -49,6 +39,7 @@
               <th>ID</th>
               <th>Nome</th>
               <th>Descrizione</th>
+              <th>Azioni</th> <!-- Aggiunta della colonna per le azioni -->
             </tr>
           </thead>
           <tbody>
@@ -56,11 +47,20 @@
               <td>{{ cliente.id }}</td>
               <td>{{ cliente.nome }}</td>
               <td>{{ cliente.descrizione }}</td>
+              <td>
+                <button class="button-delete" @click="eliminaCliente(cliente.id)">
+                  <img src="@/assets/img/trash.png" alt="Icona Trash" class="icon-trash" />
+                  Elimina
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
-    </div>
+
+
+
+  </div>
        <!-- Spazio per scorrere -->
   <div style="height: 1000px;"></div>
   </div>
@@ -100,6 +100,12 @@
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
+}
+
+.icon-trash {
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
 }
 
 .label {
@@ -224,12 +230,12 @@ export default {
       this.caricaClienti();
     },
 
-    eliminaCliente() {
+    eliminaCliente(clienteId) {
       // Prendi il token dalla sessionStorage
       const token = sessionStorage.getItem("token");
 
       // Invio della richiesta di eliminazione al server
-      fetch(`http://localhost:8080/api/v1/clienti/deletecliente/${this.clienteId}`, {
+      fetch(`http://localhost:8080/api/v1/clienti/deletecliente/${clienteId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -239,6 +245,8 @@ export default {
         if (response.ok) {
           // Cliente eliminato con successo
           this.mostraEliminaConferma = true;
+          // Caricamento dei clienti dopo l'eliminazione di un cliente
+          this.caricaClienti();
         } else {
           console.log("errore nell'eliminazione");
         }
@@ -246,9 +254,6 @@ export default {
 
       // Resetta il campo ID dopo l'eliminazione del cliente
       this.clienteId = "";
-
-      // Caricamento dei clienti dopo l'aggiunta di un nuovo cliente
-      this.caricaClienti();
     },
 
     caricaClienti() {
