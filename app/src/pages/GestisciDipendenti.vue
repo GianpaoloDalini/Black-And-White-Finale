@@ -93,8 +93,40 @@
       <span v-if="mostraConferma" class="conferma">Dati inviati correttamente!</span>
     </div>
 
+
+    <!-- Tabella dei dipendenti -->
+    
+
+    <div class="table-container">
+        <table class="dipendenti-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Cognome</th>
+              <th>Azioni</th> <!-- Aggiunta della colonna per le azioni -->
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="dipendente in dipendenti" :key="dipendente.id">
+              <td>{{ dipendente.id }}</td>
+              <td>{{ dipendente.nome }}</td>
+              <td>{{ dipendente.cognome }}</td>
+              <td>
+                <button class="button-delete" @click="eliminaDipendente(dipendente.id)">
+                  <img src="@/assets/img/trash.png" alt="Icona Trash" class="icon-trash" />
+                  Elimina
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
     <!-- Clearfix per pulire il float -->
     <div class="clearfix"></div>
+    <!-- Spazio per scorrere -->
+  <div style="height: 1000px;"></div>
   </div>
 </template>
 
@@ -193,6 +225,37 @@
   display: table;
   clear: both;
 }
+
+/* tabella */
+.table-container {
+  width: 100%;
+  padding: 10px;
+  overflow: auto;
+}
+
+.dipendenti-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dipendenti-table th,
+.dipendenti-table td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+.dipendenti-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.dipendenti-table td {
+  font-size: 14px;
+}
+
+
+
 </style>
 
 <script>
@@ -218,6 +281,10 @@ export default {
       SPAGNOLO: false,
       TEDESCO: false,
     },
+
+    dipendenti: [], // Aggiunta della lista dei dipendenti
+
+
   };
 },
 
@@ -279,8 +346,63 @@ export default {
 
       // Mostrare il messaggio di conferma
       this.mostraConferma = true;
+
+      this.caricaDipendenti();
     },
+  
+    eliminaDipendente(dipendenteId) {
+      // Prendi il token dalla sessionStorage
+      const token = sessionStorage.getItem("token");
+
+      // Invio della richiesta di eliminazione al server
+      fetch(`http://localhost:8080/api/v1/dipendenti/deletedipentente/${dipententeId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      }).then(response => {
+        if (response.ok) {
+          // dipendente eliminato con successo
+          this.mostraEliminaConferma = true;
+          // Caricamento dei dipendenti dopo l'eliminazione di un dipendente
+          this.caricaDipendenti();
+        } else {
+          console.log("errore nell'eliminazione");
+        }
+      });
+
+      // Resetta il campo ID dopo l'eliminazione del dipendente
+      this.dipententeId = "";
+    },
+
+    caricaDipendenti() {
+      // Prendi il token dalla sessionStorage
+      const token = sessionStorage.getItem("token");
+
+      fetch("http://localhost:8080/api/v1/dipendenti/getalldipenenti", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          this.dipendenti = data;
+        })
+        .catch(error => {
+          console.error("Errore durante il recupero dei dipendenti:", error);
+        });
+    },
+  
+  
+  
   },
+
+  mounted() {
+    // Caricamento dei dipendenti al caricamento della pagina
+    this.caricaDipendenti();
+  },
+
 };
 
 </script>
