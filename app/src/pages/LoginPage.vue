@@ -34,8 +34,12 @@ export default {
         .then((response) => response.json())
         .then((data) => {
           if (data.token) {
-            // Salva il token nel sessionStorage
+            // Salva il token, l'ID, il nome e il cognome nel sessionStorage
             sessionStorage.setItem("token", data.token);
+            sessionStorage.setItem("id", data.id);
+            sessionStorage.setItem("nome", data.nome);
+            sessionStorage.setItem("cognome", data.cognome);
+
             this.token = data.token; // Aggiorna la proprietà 'token'
 
             this.$router.replace('/dashboard');
@@ -88,4 +92,3 @@ export default {
   color: red;
 }
 </style>
-

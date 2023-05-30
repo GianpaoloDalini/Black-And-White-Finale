@@ -12,14 +12,14 @@
         </tr>
       </thead>
       <tbody>
-  <tr v-for="(week, index) in calendar" :key="index">
-    <td v-for="date in week" :key="date.date" :class="getCellClasses(date)" @click="changeColor(date)">
-      <div class="date">{{ date.date }}</div>
-      <div class="color-marker" :class="date.color"></div>
-    </td>
-  </tr>
-</tbody>
-
+        <tr v-for="(week, index) in calendar" :key="index">
+          <td v-for="date in week" :key="date.date" :class="[getCellClasses(date), date.color]"
+            @click="changeColor(date)">
+            <div class="date">{{ date.date }}</div>
+            <div class="color-marker"></div>
+          </td>
+        </tr>
+      </tbody>
     </table>
   </div>
 </template>
@@ -34,10 +34,11 @@ export default {
       selectedDate: null,
       calendar: [],
       currentDate: new Date(),
+      assenze: [], // Array per le assenze
     };
   },
   mounted() {
-    this.generateCalendar();
+    this.caricaAssenzeDipendente();
   },
   computed: {
     month() {
@@ -46,59 +47,162 @@ export default {
   },
   methods: {
     generateCalendar() {
-      const startOfMonthDate = startOfMonth(this.currentDate);
-      const startOfWeekDate = startOfWeek(startOfMonthDate, { weekStartsOn: 1 });
-      const endOfMonthDate = endOfMonth(this.currentDate);
+  const startOfMonthDate = startOfMonth(this.currentDate);
+  const startOfWeekDate = startOfWeek(startOfMonthDate, { weekStartsOn: 1 });
+  const endOfMonthDate = endOfMonth(this.currentDate);
+  const days = eachDayOfInterval({
+    start: startOfWeekDate,
+    end: endOfMonthDate,
+  });
 
-      const days = eachDayOfInterval({
-        start: startOfWeekDate,
-        end: endOfMonthDate,
-      });
+  this.calendar = [];
+  let week = [];
+  let dayIndex = 0;
 
-      this.calendar = [];
-      let week = [];
+  days.forEach((date) => {
+    const day = {
+      date: date.getDate(),
+      month: date.getMonth(),
+      year: date.getFullYear(),
+      color: '',
+    };
 
-      days.forEach((date) => {
-        const day = {
-          date: date.getDate(),
-          month: date.getMonth(),
-          year: date.getFullYear(),
-          color: '',
-        };
+    const hasAssenza = this.hasAssenzaForDate(day);
 
-        week.push(day);
+    if (hasAssenza) {
+      day.color = 'red'; // Imposta il colore rosso se esiste un'assenza
+    } else {
+      day.color = 'white'; // Imposta il colore verde se non esiste un'assenza
+    }
 
-        if (date.getDay() === 0) {
-          this.calendar.push(week);
-          week = [];
-        }
-      });
+    week.push(day);
+    dayIndex++;
 
-      if (week.length > 0) {
-        this.calendar.push(week);
-      }
-    },
+    if (dayIndex === 7) {
+      this.calendar.push(week);
+      week = [];
+      dayIndex = 0;
+    }
+  });
+
+  if (week.length > 0) {
+    this.calendar.push(week);
+  }
+},
+
+
     getCellClasses(date) {
       return {
         'selected': isSameMonth(date, this.selectedDate),
       };
     },
+
     changeColor(date) {
-      if (date.color === 'red') {
-        date.color = 'green';
-      } else if (date.color === 'green') {
-        date.color = 'gray';
+      const hasAssenza = this.hasAssenzaForDate(date);
+
+      if (hasAssenza) {
+        this.removeAssenzaForDate(date);
       } else {
-        date.color = 'red';
+        this.addAssenzaForDate(date);
       }
     },
+
+    hasAssenzaForDate(date) {
+      const assenzaDate = new Date(date.year, date.month, date.date);
+
+      return this.assenze.some((assenza) => {
+        const assenzaDateObj = new Date(assenza.data);
+        return assenzaDateObj.toDateString() === assenzaDate.toDateString();
+      });
+    },
+
+    addAssenzaForDate(date) {
+      const token = sessionStorage.getItem('token');
+      const dipendenteId = sessionStorage.getItem('id');
+      const assenzaDate = new Date(date.year, date.month, date.date);
+
+      const formattedDate = this.formatDate(assenzaDate); // Formatta la data nel formato corretto
+
+      fetch(`http://localhost:8080/api/v1/assenze/adddipendente/${formattedDate}/${dipendenteId}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Errore durante l\'aggiunta dell\'assenza');
+          }
+          this.caricaAssenzeDipendente();
+        })
+        .catch(error => {
+          console.error("Errore durante l'aggiunta dell'assenza:", error);
+        });
+    },
+
+    formatDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    },
+
+    removeAssenzaForDate(date) {
+      const token = sessionStorage.getItem('token');
+  const dipendenteId = sessionStorage.getItem('id');
+  const assenzaDate = new Date(date.year, date.month, date.date);
+
+  const formattedDate = this.formatDate(assenzaDate); // Formatta la data nel formato corretto
+
+  fetch(`http://localhost:8080/api/v1/assenze/removedipendente/${formattedDate}/${dipendenteId}`, {
+    method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Errore durante la rimozione dell\'assenza');
+          }
+          this.caricaAssenzeDipendente();
+        })
+        .catch(error => {
+          console.error("Errore durante la rimozione dell'assenza:", error);
+        });
+    },
+
     previousMonth() {
       this.currentDate = subMonths(this.currentDate, 1);
-      this.generateCalendar();
+      this.caricaAssenzeDipendente();
     },
+
     nextMonth() {
       this.currentDate = addMonths(this.currentDate, 1);
-      this.generateCalendar();
+      this.caricaAssenzeDipendente();
+    },
+
+    caricaAssenzeDipendente() {
+      const token = sessionStorage.getItem('token');
+      const dipendenteId = sessionStorage.getItem('id');
+
+      fetch(`http://localhost:8080/api/v1/assenze/getassenzedipendente/${dipendenteId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Errore durante la richiesta delle assenze');
+          }
+          return response.json();
+        })
+        .then(data => {
+          this.assenze = data || []; // Salva le assenze nel componente
+          this.generateCalendar(); // Ricrea il calendario in base alle nuove assenze
+        })
+        .catch(error => {
+          console.error("Errore durante il recupero delle assenze:", error);
+        });
     },
   },
 };
@@ -106,8 +210,7 @@ export default {
 
 <style scoped>
 .calendario {
-  max-width: 800px;
-  margin: 0 auto;
+  font-family: Arial, sans-serif;
 }
 
 .header {
@@ -123,44 +226,36 @@ table {
 }
 
 th,
-  td {
-    text-align: center;
-    padding: 10px;
-    border: 1px solid #ccc;
-  }
+td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
 
-  th {
-    background-color: #f2f2f2;
-  }
+th {
+  background-color: #f2f2f2;
+}
 
-  td {
-    cursor: pointer;
-    position: relative; /* Added position property */
-  }
+.selected {
+  background-color: #ccc;
+}
 
-  .date {
-    margin-bottom: 5px;
-  }
+.date {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
 
-  .color-marker {
-    position: absolute;
-    bottom: 5px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-  }
+.color-marker {
+  width: 100%;
+  height: 100%;
+}
 
-  .red {
-    background-color: #ff9999;
-  }
+.red {
+  background-color: rgba(255, 0, 0, 0.2);
+  /* Aggiorna l'opacità a 0.2 per ottenere un rosso tenue */
+}
 
-  .green {
-    background-color: #a3e6a8;
-  }
-
-  .gray {
-    background-color: #ccc;
-  }
+.white {
+  background-color: #fff;
+}
 </style>

@@ -26,7 +26,6 @@ public class AuthenticationService {
             request.getPassword()
         )
     );
-    log.info("pppp trovato");
     var user = repository.findByUsername(request.getUsername())
         .orElseThrow(() -> new RuntimeException("Utente non trovato"));
 
