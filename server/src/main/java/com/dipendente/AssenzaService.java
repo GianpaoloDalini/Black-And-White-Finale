@@ -32,7 +32,7 @@ public class AssenzaService {
         }
     }
 
-    public Assenza addPartecipanteToAssenza(Date data, String dipendenteId) {
+    public Assenza addDipendenteToAssenza(Date data, String dipendenteId) {
         Assenza assenza = assenzaRepository.findByData(data).orElse(null);
         if (assenza != null) {
             assenza.getDipendenti().add(dipendenteId);
@@ -42,7 +42,7 @@ public class AssenzaService {
         }
     }
 
-    public Assenza removePartecipanteFromAssenza(Date data, String dipendenteId) {
+    public Assenza removeDipendenteFromAssenza(Date data, String dipendenteId) {
         Assenza assenza = assenzaRepository.findByData(data).orElse(null);
         if (assenza != null) {
             assenza.getDipendenti().remove(dipendenteId);

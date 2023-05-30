@@ -20,12 +20,6 @@ public class AssenzaController {
     @Autowired
     private AssenzaService assenzaService;
 
-    @GetMapping("/getall")
-    public ResponseEntity<List<Assenza>> getAllAssenze() {
-        List<Assenza> assenze = assenzaService.getAllAssenze();
-        return new ResponseEntity<>(assenze, HttpStatus.OK);
-    }
-
     @GetMapping("/getassenzabydata/{data}")
     public ResponseEntity<Assenza> getAssenzaByData(@PathVariable("data") String dataString) {
         try {
@@ -55,9 +49,10 @@ public class AssenzaController {
         } else {
             assenza = assenzaService.addAssenza(data, dipendenteId);
         }
-return ResponseEntity.ok(assenza);
-        
+        return ResponseEntity.ok(assenza);
+
     }
+
     @DeleteMapping("/removedipendente/{data}/{dipendenteId}")
     @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')|| hasAuthority('DIPENDENTE')")
     public ResponseEntity<Assenza> removePartecipanteFromAssenza(
@@ -67,24 +62,23 @@ return ResponseEntity.ok(assenza);
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             Date data = dateFormat.parse(dataString);
             Assenza updatedAssenza = assenzaService.removePartecipanteFromAssenza(data, dipendenteId);
-            
-                if (updatedAssenza.getDipendenti().isEmpty()) {
-                    boolean deleted = assenzaService.deleteAssenzaByData(data);
-                    if (deleted) {
-                        return new ResponseEntity<>(HttpStatus.OK);
-                    } else {
-                        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-                    }
+
+            if (updatedAssenza.getDipendenti().isEmpty()) {
+                boolean deleted = assenzaService.deleteAssenzaByData(data);
+                if (deleted) {
+                    return new ResponseEntity<>(HttpStatus.OK);
                 } else {
-                    return new ResponseEntity<>(updatedAssenza, HttpStatus.OK);
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
-            
-                
+            } else {
+                return new ResponseEntity<>(updatedAssenza, HttpStatus.OK);
+            }
+
         } catch (ParseException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-
+    @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')|| hasAuthority('DIPENDENTE')")
     @GetMapping("/getassenzedipendente/{dipendenteId}")
     public ResponseEntity<List<Assenza>> getAssenzeByDipendente(@PathVariable("dipendenteId") String dipendenteId) {
         List<Assenza> assenze = assenzaService.getAssenzeByDipendente(dipendenteId);
