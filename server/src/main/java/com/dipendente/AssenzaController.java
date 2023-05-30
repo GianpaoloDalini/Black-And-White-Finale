@@ -38,7 +38,7 @@ public class AssenzaController {
 
     @PostMapping("/adddipendente/{data}/{dipendenteId}")
     @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')|| hasAuthority('DIPENDENTE')")
-    public ResponseEntity<Assenza> addPartecipanteToAssenza(
+    public ResponseEntity<Assenza> addDipendenteToAssenza(
             @PathVariable("data") @DateTimeFormat(pattern = "yyyy-MM-dd") Date data,
             @PathVariable("dipendenteId") String dipendenteId) {
 
@@ -55,13 +55,13 @@ public class AssenzaController {
 
     @DeleteMapping("/removedipendente/{data}/{dipendenteId}")
     @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')|| hasAuthority('DIPENDENTE')")
-    public ResponseEntity<Assenza> removePartecipanteFromAssenza(
+    public ResponseEntity<Assenza> removeDipendenteFromAssenza(
             @PathVariable("data") String dataString,
             @PathVariable("dipendenteId") String dipendenteId) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             Date data = dateFormat.parse(dataString);
-            Assenza updatedAssenza = assenzaService.removePartecipanteFromAssenza(data, dipendenteId);
+            Assenza updatedAssenza = assenzaService.removeDipendenteFromAssenza(data, dipendenteId);
 
             if (updatedAssenza.getDipendenti().isEmpty()) {
                 boolean deleted = assenzaService.deleteAssenzaByData(data);
