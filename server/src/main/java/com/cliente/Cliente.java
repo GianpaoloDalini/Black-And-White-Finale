@@ -1,10 +1,14 @@
 package com.cliente;
-
-import java.util.UUID;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Document(collection = "clienti")
 public class Cliente {
     
@@ -15,14 +19,9 @@ public class Cliente {
     
     // Costruttori, getter e setter
     
-    public Cliente() {
-        this.id = generateRandomId();
-    }
-    
     public Cliente(String nome, String descrizione) {
         this.nome = nome;
         this.descrizione = descrizione;
-        this.id = generateRandomId();
     }
     
     // Metodi getter e setter
@@ -51,8 +50,4 @@ public class Cliente {
         this.descrizione = descrizione;
     }
     
-    private String generateRandomId() {
-        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-        return uuid.substring(0, 5);
-    }
 }

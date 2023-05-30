@@ -23,23 +23,22 @@ public class DipendenteController {
     @Autowired
     private DipendenteService service;
 
-@PostMapping("/adddipendente")
-@PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')")
-public ResponseEntity<Dipendente> addDipendente(@RequestBody Dipendente dipendente) {
-    Dipendente savedDipendente = service.addDipendente(dipendente);
-    return new ResponseEntity<>(savedDipendente, HttpStatus.CREATED);
-}
+    @PostMapping("/adddipendente")
+    @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')")
+    public ResponseEntity<Dipendente> addDipendente(@RequestBody Dipendente dipendente) {
+        Dipendente savedDipendente = service.addDipendente(dipendente);
+        return new ResponseEntity<>(savedDipendente, HttpStatus.CREATED);
+    }
 
-@GetMapping("/getalldipendenti")
-@PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')")
-public ResponseEntity<List<Dipendente>> getAllDipendenti() {
-    final List<Dipendente> dipendenti = service.getAllDipendenti();
-    return new ResponseEntity<>(dipendenti, HttpStatus.OK);
-}
+    @GetMapping("/getalldipendenti")
+    @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')")
+    public ResponseEntity<List<Dipendente>> getAllDipendenti() {
+        final List<Dipendente> dipendenti = service.getAllDipendenti();
+        return new ResponseEntity<>(dipendenti, HttpStatus.OK);
+    }
 
     @DeleteMapping("/deletedipendente/{id}")
-    
-@PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')")
+    @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')")
     public ResponseEntity<String> deleteDipendente(@PathVariable String id) {
         boolean deleted = service.deleteDipendente(id);
         if (deleted) {
@@ -48,6 +47,5 @@ public ResponseEntity<List<Dipendente>> getAllDipendenti() {
             return new ResponseEntity<>("Impossibile trovare il Dipendente con l'ID specificato", HttpStatus.NOT_FOUND);
         }
     }
-
 
 }

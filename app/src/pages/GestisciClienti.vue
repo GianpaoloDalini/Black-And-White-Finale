@@ -36,7 +36,6 @@
         <table class="clienti-table">
           <thead>
             <tr>
-              <th>ID</th>
               <th>Nome</th>
               <th>Descrizione</th>
               <th>Azioni</th> <!-- Aggiunta della colonna per le azioni -->
@@ -44,7 +43,6 @@
           </thead>
           <tbody>
             <tr v-for="cliente in clienti" :key="cliente.id">
-              <td>{{ cliente.id }}</td>
               <td>{{ cliente.nome }}</td>
               <td>{{ cliente.descrizione }}</td>
               <td>

@@ -17,24 +17,21 @@ public class ClienteController {
     private ClienteService service;
 
     @PostMapping("/addcliente")
-    
-@PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')")
+    @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')")
     public ResponseEntity<Cliente> addCliente(@RequestBody Cliente cliente) {
         Cliente savedCliente = service.addCliente(cliente);
         return new ResponseEntity<>(savedCliente, HttpStatus.CREATED);
     }
 
     @GetMapping("/getallclienti")
-    
-@PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')")
+    @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')")
     public ResponseEntity<List<Cliente>> getAllClienti() {
         final List<Cliente> clienti = service.getAllClienti();
         return new ResponseEntity<>(clienti, HttpStatus.OK);
     }
 
     @DeleteMapping("/deletecliente/{id}")
-    
-@PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')")
+    @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')")
     public ResponseEntity<String> deleteCliente(@PathVariable String id) {
         boolean deleted = service.deleteCliente(id);
         if (deleted) {

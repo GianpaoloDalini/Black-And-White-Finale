@@ -12,8 +12,6 @@ public class ClienteService {
     private ClienteRepository repository;
 
     public Cliente addCliente(Cliente cliente) {
-        // Effettua qui eventuali operazioni di validazione o di business logic
-        // prima di salvare il cliente nel repository
         return repository.save(cliente);
     }
 
@@ -33,7 +31,4 @@ public class ClienteService {
     public List<Cliente> getAllClienti() {
         return repository.findAll();
     }
-    
-
-    // Aggiungi altri metodi per le operazioni CRUD come la lettura, l'aggiornamento e l'eliminazione dei clienti
 }

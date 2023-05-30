@@ -101,7 +101,6 @@
         <table class="dipendenti-table">
           <thead>
             <tr>
-              <th>ID</th>
               <th>Nome</th>
               <th>Cognome</th>
               <th>Azioni</th> <!-- Aggiunta della colonna per le azioni -->
@@ -109,7 +108,6 @@
           </thead>
           <tbody>
             <tr v-for="dipendente in dipendenti" :key="dipendente.id">
-              <td>{{ dipendente.id }}</td>
               <td>{{ dipendente.nome }}</td>
               <td>{{ dipendente.cognome }}</td>
               <td>
@@ -355,7 +353,7 @@ export default {
       const token = sessionStorage.getItem("token");
 
       // Invio della richiesta di eliminazione al server
-      fetch(`http://localhost:8080/api/v1/dipendenti/deletedipentente/${dipententeId}`, {
+      fetch(`http://localhost:8080/api/v1/dipendenti/deletedipendente/${dipendenteId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -373,14 +371,14 @@ export default {
       });
 
       // Resetta il campo ID dopo l'eliminazione del dipendente
-      this.dipententeId = "";
+      this.dipendenteId = "";
     },
 
     caricaDipendenti() {
       // Prendi il token dalla sessionStorage
       const token = sessionStorage.getItem("token");
 
-      fetch("http://localhost:8080/api/v1/dipendenti/getalldipenenti", {
+      fetch("http://localhost:8080/api/v1/dipendenti/getalldipendenti", {
         headers: {
           "Authorization": `Bearer ${token}`,
         },

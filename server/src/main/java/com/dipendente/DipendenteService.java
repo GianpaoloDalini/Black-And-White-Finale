@@ -33,10 +33,8 @@ public class DipendenteService {
             return false;
         }
     }
-    
+
     public List<Dipendente> getAllDipendenti() {
         return repository.findAll();
     }
-    
-
 }
