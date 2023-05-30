@@ -4,13 +4,13 @@
     <div class="title">
       <h2 style="font-weight: bold">DATI EVENTO</h2>
     </div>
-
+<!-- Lista clienti -->
     <div class="form-group">
   <label for="cliente" class="label">Cliente:</label>
   <div>
     <select id="cliente" class="input" v-model="cliente">
       <option value="" disabled selected>&lt;seleziona il cliente&gt;</option>
-      <option v-for="cliente in clientiDisponibili" :key="cliente.id" :value="cliente.id">{{ cliente.nome }}</option>
+      <option v-for="cliente in clienti" :key="cliente.id" :value="cliente.id">{{ cliente.nome }}</option>
     </select>
   </div>
 </div>
@@ -173,7 +173,7 @@ export default {
   created() {
 
     // Recupera la lista dei dipendenti clienti
-    this.fetchClienti();
+    this.caricaClienti();
   
     // Recupera la lista dei dipendenti disponibili
     this.fetchDipendenti();
@@ -182,17 +182,29 @@ export default {
     this.fetchEventi();
   },
   methods: {
-    fetchClienti() {
-      // Effettua la richiesta al server per ottenere la lista dei clienti
-      fetch("http://localhost:8080/api/v1/clienti/getallclienti")
-        .then((response) => response.json())
-        .then((data) => {
-          this.clientiDisponibili = data;
+    caricaClienti() {
+      // Prendi il token dalla sessionStorage
+      const token = sessionStorage.getItem("token");
+
+      fetch("http://localhost:8080/api/v1/clienti/getallclienti", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          this.clienti = data;
         })
-        .catch((error) => {
+        .catch(error => {
           console.error("Errore durante il recupero dei clienti:", error);
         });
     },
+
+
+
+
+
+
     fetchDipendenti() {
       // Effettua la richiesta al server per ottenere la lista dei dipendenti
       fetch("http://localhost:8080/api/v1/dipendenti/getalldipendenti")
