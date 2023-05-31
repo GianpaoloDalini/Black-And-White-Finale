@@ -1,5 +1,5 @@
 spring:
   data:
     mongodb:
-      uri : mongodb+srv://tecchio:sentimentoculturale@clusterbw.clguumb.mongodb.net/?retryWrites=true&w=majority
+      uri : mongodb+srv://pac2023:algoritmi@blackandwhite.tsiec0k.mongodb.net/?retryWrites=true&w=majority
       database: BlackAndWhite
