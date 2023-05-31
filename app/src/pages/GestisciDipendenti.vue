@@ -1,45 +1,31 @@
 <template>
   <div>
     <div class="container">
-      <!-- Titolo -->
       <div class="title">
         <h2 style="font-weight: bold">INSERISCI DATI DEL DIPENDENTE</h2>
       </div>
-
-      <!-- Form -->
-      <!-- Form -->
       <div class="form-group">
         <div class="form form-inline">
-          <!-- Username -->
           <label for="username" class="label">Username:</label>
           <div class="input-wrapper">
             <input type="text" id="username" class="input" v-model="username" />
           </div>
-
-          <!-- Password -->
           <label for="password" class="label">Password:</label>
           <div class="input-wrapper">
             <input type="password" id="password" class="input" v-model="password" />
           </div>
-
-          <!-- Nome -->
           <label for="name" class="label">Nome:</label>
           <div class="input-wrapper">
             <input type="text" id="name" class="input" v-model="nome" />
           </div>
-
-          <!-- Cognome -->
           <label for="surname" class="label">Cognome:</label>
           <div class="input-wrapper">
             <input type="text" id="surname" class="input" v-model="cognome" />
           </div>
         </div>
       </div>
-
-      <!-- Checkbox qualifiche e lingue -->
       <div class="row">
         <div class="column">
-          <!-- Qualifiche -->
           <div class="checkbox-group">
             <label class="label">Qualifiche:</label>
             <div class="checkbox">
@@ -121,9 +107,8 @@
         </table>
       </div>
 
-    <!-- Clearfix per pulire il float -->
+    <!-- clearfix per pulire il float -->
     <div class="clearfix"></div>
-    <!-- Spazio per scorrere -->
   <div style="height: 1000px;"></div>
   </div>
 </template>
@@ -140,7 +125,6 @@
   justify-content: center;
   align-items: baseline;
   margin-bottom: 20px;
-  /* Aggiunge uno spazio di 20px sotto il contenitore principale */
 }
 
 .row {
@@ -150,7 +134,6 @@
 .column {
   flex: 1;
   margin-right: 100px;
-  /* Aggiunge uno spazio di 100px tra le colonne */
 }
 
 .column:last-child {
@@ -177,7 +160,6 @@
   display: flex;
   align-items: center;
   margin-bottom: 5px;
-  /* Aggiunge uno spazio di 5px tra l'etichetta e l'input */
 }
 
 .input {
@@ -217,14 +199,12 @@
   top: 90%;
 }
 
-/* Clearfix */
 .clearfix::after {
   content: "";
   display: table;
   clear: both;
 }
 
-/* tabella */
 .table-container {
   width: 100%;
   padding: 10px;
@@ -265,7 +245,7 @@ export default {
     password: "",
     nome: "",
     cognome: "",
-    referente: false, // Cambia il nome della variabile in "referente"
+    referente: false, 
     mostraConferma: false,
     qualifiche: {
       AUTOMUNITO: false,
@@ -280,7 +260,7 @@ export default {
       TEDESCO: false,
     },
 
-    dipendenti: [], // Aggiunta della lista dei dipendenti
+    dipendenti: [], 
 
 
   };
@@ -289,8 +269,6 @@ export default {
   methods: {
     inviaDati() {
       const role = this.referente ? "REFERENTE" : "DIPENDENTE";
-
-      // Creazione di un nuovo oggetto Dipendente con i valori correnti
       const lingueSelezionate = Object.keys(this.lingue).filter(
         (l) => this.lingue[l]
       );
@@ -333,26 +311,18 @@ export default {
         })
         .catch((error) => {
           console.error("Errore durante la richiesta:", error);
-          // Gestisci l'errore se necessario
         });
-
-      // Resettare i valori del form
       this.username = "";
       this.password = "";
       this.nome = "";
       this.cognome = "";
-
-      // Mostrare il messaggio di conferma
       this.mostraConferma = true;
 
       this.caricaDipendenti();
     },
   
     eliminaDipendente(dipendenteId) {
-      // Prendi il token dalla sessionStorage
       const token = sessionStorage.getItem("token");
-
-      // Invio della richiesta di eliminazione al server
       fetch(`http://localhost:8080/api/v1/dipendenti/deletedipendente/${dipendenteId}`, {
         method: "DELETE",
         headers: {
@@ -361,21 +331,16 @@ export default {
         },
       }).then(response => {
         if (response.ok) {
-          // dipendente eliminato con successo
           this.mostraEliminaConferma = true;
-          // Caricamento dei dipendenti dopo l'eliminazione di un dipendente
           this.caricaDipendenti();
         } else {
           console.log("errore nell'eliminazione");
         }
       });
-
-      // Resetta il campo ID dopo l'eliminazione del dipendente
       this.dipendenteId = "";
     },
 
     caricaDipendenti() {
-      // Prendi il token dalla sessionStorage
       const token = sessionStorage.getItem("token");
 
       fetch("http://localhost:8080/api/v1/dipendenti/getalldipendenti", {
@@ -397,7 +362,6 @@ export default {
   },
 
   mounted() {
-    // Caricamento dei dipendenti al caricamento della pagina
     this.caricaDipendenti();
   },
 

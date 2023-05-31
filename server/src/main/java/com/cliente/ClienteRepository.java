@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ClienteRepository extends MongoRepository<Cliente, String> {
-    // Aggiungi eventuali metodi personalizzati per la gestione delle query
+    // aggiungi eventuali metodi  per le query
 }

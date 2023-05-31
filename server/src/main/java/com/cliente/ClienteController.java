@@ -41,5 +41,4 @@ public class ClienteController {
         }
     }
 
-    // Altri metodi per la gestione delle operazioni CRUD per il modello Cliente
 }

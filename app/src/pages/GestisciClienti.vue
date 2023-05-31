@@ -1,12 +1,9 @@
 <template>
   <div class="container">
     <div class="left-column">
-      <!-- Titolo -->
       <div class="title">
         <h2 style="font-weight: bold">DATI CLIENTE</h2>
       </div>
-
-      <!-- Form di Aggiunta Cliente -->
       <div class="form-container">
         <div class="form-group">
           <label for="nome" class="label">Nome:</label>
@@ -28,17 +25,13 @@
     </div>
 
     <div class="right-column">
-
-      <!-- Tabella dei clienti -->
-    
-
       <div class="table-container">
         <table class="clienti-table">
           <thead>
             <tr>
               <th>Nome</th>
               <th>Descrizione</th>
-              <th>Azioni</th> <!-- Aggiunta della colonna per le azioni -->
+              <th>Azioni</th> 
             </tr>
           </thead>
           <tbody>
@@ -199,17 +192,13 @@ export default {
       mostraConferma: false,
       clienteId: "",
       mostraEliminaConferma: false,
-      clienti: [], // Aggiunta della lista dei clienti
+      clienti: [], 
     };
   },
   methods: {
     inviaDati() {
       const cliente = new Cliente(this.nome, this.descrizione);
-
-      // Prendi il token dalla sessionStorage
       const token = sessionStorage.getItem("token");
-
-      // Invio dei dati al server
       fetch("http://localhost:8080/api/v1/clienti/addcliente", {
         method: "POST",
         body: JSON.stringify(cliente),
@@ -218,21 +207,14 @@ export default {
           "Authorization": `Bearer ${token}`,
         },
       });
-
-      // Resetta i campi del form dopo l'invio dei dati
       this.nome = "";
       this.descrizione = "";
       this.mostraConferma = true;
-
-      // Caricamento dei clienti dopo l'aggiunta di un nuovo cliente
       this.caricaClienti();
     },
 
     eliminaCliente(clienteId) {
-      // Prendi il token dalla sessionStorage
       const token = sessionStorage.getItem("token");
-
-      // Invio della richiesta di eliminazione al server
       fetch(`http://localhost:8080/api/v1/clienti/deletecliente/${clienteId}`, {
         method: "DELETE",
         headers: {
@@ -241,21 +223,16 @@ export default {
         },
       }).then(response => {
         if (response.ok) {
-          // Cliente eliminato con successo
           this.mostraEliminaConferma = true;
-          // Caricamento dei clienti dopo l'eliminazione di un cliente
           this.caricaClienti();
         } else {
           console.log("errore nell'eliminazione");
         }
       });
-
-      // Resetta il campo ID dopo l'eliminazione del cliente
       this.clienteId = "";
     },
 
     caricaClienti() {
-      // Prendi il token dalla sessionStorage
       const token = sessionStorage.getItem("token");
 
       fetch("http://localhost:8080/api/v1/clienti/getallclienti", {
@@ -274,7 +251,7 @@ export default {
   },
 
   mounted() {
-    // Caricamento dei clienti al caricamento della pagina
+    // caricamento dei clienti al caricamento della pagina
     this.caricaClienti();
   },
 };

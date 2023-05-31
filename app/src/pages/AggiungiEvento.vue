@@ -77,7 +77,7 @@
   justify-content: center;
   align-items: baseline;
   margin-bottom: 20px;
-  overflow-y: auto; /* Abilita lo scrolling verticale */
+  overflow-y: auto;
 }
 
 .title {
@@ -163,27 +163,20 @@ export default {
       isFesta: false,
       dipendenti: [],
       mostraConferma: false,
-      eventi: [], // Array degli eventi
-      clienti: [], // Array dei clienti disponibili
-      dipendentiDisponibili: [], // Array dei dipendenti disponibili
-      clientiDisponibili: [], // Array di clienti disponibili
+      eventi: [], 
+      clienti: [], 
+      dipendentiDisponibili: [],
+      clientiDisponibili: [],
    
     };
   },
   created() {
-
-    // Recupera la lista dei dipendenti clienti
-    this.caricaClienti();
-  
-    // Recupera la lista dei dipendenti disponibili
+this.caricaClienti();
     this.fetchDipendenti();
-
-    // Recupera la lista degli eventi
     this.fetchEventi();
   },
   methods: {
     caricaClienti() {
-      // Prendi il token dalla sessionStorage
       const token = sessionStorage.getItem("token");
 
       fetch("http://localhost:8080/api/v1/clienti/getallclienti", {
@@ -247,20 +240,15 @@ export default {
       })
         .then((response) => {
           if (response.ok) {
-            // Evento aggiunto con successo
             this.mostraConferma = true;
-            // Aggiorna la lista degli eventi
             this.fetchEventi();
           } else {
-            // Gestione dell'errore in caso di fallimento dell'aggiunta
-            // Puoi mostrare un messaggio di errore o fare altre azioni
+            // TODO Gestione dell'errore 
           }
         })
         .catch((error) => {
           console.error("Errore durante l'invio dei dati evento:", error);
         });
-
-      // Resetta i campi del form dopo l'invio dei dati
       this.cliente = "";
       this.data = "";
       this.luogo = "";
@@ -269,7 +257,6 @@ export default {
       this.dipendenti = [];
     },
     eliminaEvento() {
-      // Invio della richiesta di eliminazione al server
       fetch(`http://localhost:8080/api/v1/eventi/deleteevento/${this.eventoId}`, {
         method: "DELETE",
         headers: {
@@ -278,20 +265,15 @@ export default {
       })
         .then((response) => {
           if (response.ok) {
-            // Evento eliminato con successo
             this.mostraEliminaConferma = true;
-            // Aggiorna la lista degli eventi
             this.fetchEventi();
           } else {
-            // Gestione dell'errore in caso di fallimento dell'eliminazione
-            // Puoi mostrare un messaggio di errore o fare altre azioni
+            // TODO Gestione dell'errore 
           }
         })
         .catch((error) => {
           console.error("Errore durante l'eliminazione dell'evento:", error);
         });
-
-      // Resetta il campo ID dopo l'eliminazione dell'evento
       this.eventoId = "";
     },
   },

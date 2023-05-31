@@ -33,8 +33,6 @@ public class Evento {
         this.isFesta = isFesta;
         this.dipendenti = dipendenti;
     }
-
-    // Genera un ID alfanumerico UUID di 6 cifre
     private String generateRandomId() {
         return UUID.randomUUID().toString().replace("-", "").substring(0, 6);
     }

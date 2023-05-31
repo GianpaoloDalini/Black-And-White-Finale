@@ -21,6 +21,4 @@ public class EventoService {
         return false;
     }
 
-    // Altri metodi del service, se necessari
-
 }

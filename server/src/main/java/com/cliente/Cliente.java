@@ -17,14 +17,10 @@ public class Cliente {
     private String nome;
     private String descrizione;
     
-    // Costruttori, getter e setter
-    
     public Cliente(String nome, String descrizione) {
         this.nome = nome;
         this.descrizione = descrizione;
     }
-    
-    // Metodi getter e setter
     
     public String getId() {
         return id;

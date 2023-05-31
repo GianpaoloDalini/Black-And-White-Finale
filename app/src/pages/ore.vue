@@ -38,7 +38,7 @@ import { it } from 'date-fns/locale';
 export default {
   data() {
     return {
-      employees: [], // Aggiungi i tuoi dati dei dipendenti qui
+      employees: [],
       selectedEmployee: null,
       years: [],
       selectedYear: null,
@@ -74,9 +74,7 @@ export default {
       this.selectedMonth = null;
     },
     generateReport() {
-      // Logica per generare il report
-      // Utilizza this.selectedEmployee, this.selectedYear e this.selectedMonth per ottenere i dati necessari
-      // Assegna il report risultante a this.report
+      // TODO Logica per generare il report
     },
   },
 };

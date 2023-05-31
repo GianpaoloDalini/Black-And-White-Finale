@@ -25,7 +25,6 @@
       </div>
     </div>
 
-    <!-- Pulsante di conferma -->
     <button class="button" @click="inviaDati">Conferma</button>
     <span v-if="mostraConferma" class="conferma"
       >Cliente aggiunto correttamente!</span
@@ -34,7 +33,7 @@
 </template>
 
 <style>
-/* Stili per il container principale, form e pulsante */
+
 .container {
   max-width: 800px;
   margin: 0 auto;
@@ -122,8 +121,7 @@ export default {
     inviaDati() {
       const cliente = new Cliente(this.nome, this.descrizione);
 
-      // Esegui l'invio dei dati al server o gestisci la logica qui
-
+      // TODO esegui l'invio dei dati al server 
       // Resetta i campi del form dopo l'invio dei dati
       this.nome = "";
       this.descrizione = "";

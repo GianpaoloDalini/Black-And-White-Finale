@@ -35,32 +35,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
-        final String username; // definito per il check sul db, lo estraggo la JWT token
+        final String username; 
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        jwt = authHeader.substring(7); // è un JWT ma senza l'inizio del token
+        jwt = authHeader.substring(7); 
         username = jwtService.extractUsername(jwt);
-
-        // sono riuscito ad estrarre la mail dal token e controllo che user non è stato
-        // ancora autenticato(== null)
-
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            // quindi ora controllo che la mail è dentro il DB perché non l'ho ancora
-            // controllato
-            // posso chiamare anche solo User perché estende UserDetails
-
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
-            // Controllo se il token è ancora valido, ed inoltre vedo se il token è
-            // associato correttamente all'user
-
-            if (jwtService.isTokenValid(jwt, userDetails)) { // Qui inizia la tipica SpringSecurity
-                // Classe di cui ha bisogno spring per aggiornare la security context
+            if (jwtService.isTokenValid(jwt, userDetails)) { 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,

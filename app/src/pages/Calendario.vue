@@ -34,7 +34,7 @@ export default {
       selectedDate: null,
       calendar: [],
       currentDate: new Date(),
-      assenze: [], // Array per le assenze
+      assenze: [],
     };
   },
   mounted() {
@@ -70,9 +70,9 @@ export default {
     const hasAssenza = this.hasAssenzaForDate(day);
 
     if (hasAssenza) {
-      day.color = 'red'; // Imposta il colore rosso se esiste un'assenza
+      day.color = 'red'; 
     } else {
-      day.color = 'white'; // Imposta il colore verde se non esiste un'assenza
+      day.color = 'white'; 
     }
 
     week.push(day);
@@ -121,7 +121,7 @@ export default {
       const dipendenteId = sessionStorage.getItem('id');
       const assenzaDate = new Date(date.year, date.month, date.date);
 
-      const formattedDate = this.formatDate(assenzaDate); // Formatta la data nel formato corretto
+      const formattedDate = this.formatDate(assenzaDate); // Formatta la data
 
       fetch(`http://localhost:8080/api/v1/assenze/adddipendente/${formattedDate}/${dipendenteId}`, {
         method: 'POST',
@@ -152,7 +152,7 @@ export default {
   const dipendenteId = sessionStorage.getItem('id');
   const assenzaDate = new Date(date.year, date.month, date.date);
 
-  const formattedDate = this.formatDate(assenzaDate); // Formatta la data nel formato corretto
+  const formattedDate = this.formatDate(assenzaDate); 
 
   fetch(`http://localhost:8080/api/v1/assenze/removedipendente/${formattedDate}/${dipendenteId}`, {
     method: 'DELETE',
@@ -197,8 +197,8 @@ export default {
           return response.json();
         })
         .then(data => {
-          this.assenze = data || []; // Salva le assenze nel componente
-          this.generateCalendar(); // Ricrea il calendario in base alle nuove assenze
+          this.assenze = data || []; 
+          this.generateCalendar(); // ricrea il calendario in base alle nuove assenze
         })
         .catch(error => {
           console.error("Errore durante il recupero delle assenze:", error);
@@ -252,7 +252,6 @@ th {
 
 .red {
   background-color: rgba(255, 0, 0, 0.2);
-  /* Aggiorna l'opacità a 0.2 per ottenere un rosso tenue */
 }
 
 .white {

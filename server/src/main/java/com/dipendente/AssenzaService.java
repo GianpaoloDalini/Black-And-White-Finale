@@ -64,7 +64,7 @@ public class AssenzaService {
     public Assenza addAssenza(Date data, String dipendenteId) {
         Assenza assenza = new Assenza();
         assenza.setData(data);
-        assenza.setDipendenti(new ArrayList<>()); // Inizializza la lista dei dipendenti
+        assenza.setDipendenti(new ArrayList<>());
         assenza.getDipendenti().add(dipendenteId);
         return assenzaRepository.save(assenza);
     }
