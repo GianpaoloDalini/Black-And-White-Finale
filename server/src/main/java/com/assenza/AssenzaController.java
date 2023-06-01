@@ -1,4 +1,4 @@
-package com.dipendente;
+package com.assenza;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;

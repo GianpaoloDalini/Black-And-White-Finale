@@ -1,4 +1,4 @@
-package com.dipendente;
+package com.assenza;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
