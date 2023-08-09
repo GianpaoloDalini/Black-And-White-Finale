@@ -84,4 +84,20 @@ public class AssenzaController {
         List<Assenza> assenze = assenzaService.getAssenzeByDipendente(dipendenteId);
         return new ResponseEntity<>(assenze, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')|| hasAuthority('DIPENDENTE')")
+    @GetMapping("/getassenzedipendente/{dipendenteId}/bydata")
+    public ResponseEntity<List<Assenza>> getAssenzeByDipendenteAndData(
+            @PathVariable("dipendenteId") String dipendenteId,
+            @RequestParam(name = "data", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date data) {
+        List<Assenza> assenze;
+
+        if (data != null) {
+            assenze = assenzaService.getAssenzeByDipendenteAndData(dipendenteId, data);
+        } else {
+            assenze = assenzaService.getAssenzeByDipendente(dipendenteId);
+        }
+
+        return new ResponseEntity<>(assenze, HttpStatus.OK);
+    }
 }

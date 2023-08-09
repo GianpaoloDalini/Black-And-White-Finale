@@ -80,4 +80,8 @@ public class AssenzaService {
 
         return null;
     }
+
+    public List<Assenza> getAssenzeByDipendenteAndData(String dipendenteId, Date data) {
+        return assenzaRepository.findByDipendentiContainingAndData(dipendenteId, data);
+    }
 }

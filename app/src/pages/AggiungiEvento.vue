@@ -4,25 +4,27 @@
     <div class="title">
       <h2 style="font-weight: bold">DATI EVENTO</h2>
     </div>
-<!-- Lista clienti -->
-    <div class="form-group">
-  <label for="cliente" class="label">Cliente:</label>
-  <div>
-    <select id="cliente" class="input" v-model="cliente">
-      <option value="" disabled selected>&lt;seleziona il cliente&gt;</option>
-      <option v-for="cliente in clienti" :key="cliente.id" :value="cliente.id">{{ cliente.nome }}</option>
-    </select>
-  </div>
-</div>
 
-
+    <!-- Lista clienti -->
     <div class="form-group">
-      <label for="data" class="label">Data:</label>
-      <div class="input-wrapper">
-        <input type="date" id="data" class="input" v-model="data" />
+      <label for="cliente" class="label">Cliente:</label>
+      <div>
+        <select id="cliente" class="input" v-model="cliente">
+          <option value="" disabled selected>&lt;seleziona il cliente&gt;</option>
+          <option v-for="cliente in clienti" :key="cliente.id" :value="cliente.id">{{ cliente.nome }}</option>
+        </select>
       </div>
     </div>
 
+    <!-- Data -->
+    <div class="form-group">
+      <label for="data" class="label">Data:</label>
+      <div class="input-wrapper">
+        <input type="date" id="data" class="input" v-model="data" @change="fetchDipendentiDisponibili" />
+      </div>
+    </div>
+
+    <!-- Luogo -->
     <div class="form-group">
       <label for="luogo" class="label">Luogo:</label>
       <div class="input-wrapper">
@@ -30,6 +32,7 @@
       </div>
     </div>
 
+    <!-- Descrizione -->
     <div class="form-group">
       <label for="descrizione" class="label">Descrizione:</label>
       <div class="input-wrapper">
@@ -37,6 +40,7 @@
       </div>
     </div>
 
+    <!-- È una festa -->
     <div class="form-group">
       <label for="isFesta" class="label">È una festa:</label>
       <div class="input-wrapper">
@@ -44,6 +48,42 @@
       </div>
     </div>
 
+    <!-- Numero di dipendenti -->
+    <div class="form-group">
+      <label for="numeroDipendenti" class="label">Numero di Dipendenti:</label>
+      <div class="input-wrapper">
+        <input type="number" id="numeroDipendenti" class="input" v-model="numeroDipendenti" />
+      </div>
+    </div>
+
+    <!-- Tabella delle qualifiche necessarie -->
+    <div class="form-group">
+      <label class="label">Qualifiche necessarie:</label>
+      <div class="qualifiche-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Qualifica</th>
+              <th>Numero Persone</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(quantity, qualifica) in qualificheNecessarie" :key="qualifica">
+              <td>{{ qualifica }}</td>
+              <td>
+                <div class="numero-persone">
+                  <button class="decrease-button" @click="decreaseQuantity(qualifica)">-</button>
+                  {{ quantity }}
+                  <button class="increase-button" @click="increaseQuantity(qualifica)">+</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Selezione dipendenti -->
     <div class="form-group">
       <label for="dipendenti" class="label">Dipendenti:</label>
       <div class="input-wrapper">
@@ -57,99 +97,11 @@
     <button class="button" @click="inviaDati">Conferma</button>
     <span v-if="mostraConferma" class="conferma">Evento aggiunto correttamente!</span>
 
-      <!-- Spazio per scorrere -->
-  <div style="height: 1000px;"></div>
+    <!-- Spazio per scorrere -->
+    <div style="height: 1000px;"></div>
   </div>
-
-  
 </template>
 
-<style>
-/* Stili per il container principale, form e pulsante */
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 5px;
-  background-color: #f9f9f9;
-  border-radius: 5px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: baseline;
-  margin-bottom: 20px;
-  overflow-y: auto;
-}
-
-.title {
-  margin-bottom: 20px;
-}
-
-.title h2 {
-  font-weight: bold;
-}
-
-.form-group {
-  padding: 10px;
-  margin-bottom: 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-.label {
-  display: block;
-  font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.input-wrapper {
-  display: flex;
-  align-items: center;
-}
-
-.button-delete {
-  background-color: red;
-}
-
-.input {
-  width: 100%;
-  height: 40px;
-  padding: 5px 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.textarea {
-  width: 100%;
-  min-height: 100px;
-  padding: 5px 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.button {
-  padding: 10px 50px;
-  background-color: #4caf50;
-  color: #fff;
-  font-size: 16px;
-  font-weight: bold;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.conferma {
-  display: inline-block;
-  margin-left: 10px;
-  font-size: 14px;
-  color: green;
-  margin-top: 10px;
-}
-</style>
 <script>
 import Evento from "@/models/Evento.js";
 
@@ -163,15 +115,21 @@ export default {
       isFesta: false,
       dipendenti: [],
       mostraConferma: false,
-      eventi: [], 
-      clienti: [], 
+      eventi: [],
+      clienti: [],
       dipendentiDisponibili: [],
       clientiDisponibili: [],
-   
+      numeroDipendenti: 0,
+      qualificheNecessarie: {
+        BAR: 0,
+        SALA: 0,
+        CUCINA: 0,
+        AUTOMUNITO: 0,
+      },
     };
   },
   created() {
-this.caricaClienti();
+    this.caricaClienti();
     this.fetchDipendenti();
     this.fetchEventi();
   },
@@ -181,7 +139,7 @@ this.caricaClienti();
 
       fetch("http://localhost:8080/api/v1/clienti/getallclienti", {
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       })
         .then(response => response.json())
@@ -192,15 +150,15 @@ this.caricaClienti();
           console.error("Errore durante il recupero dei clienti:", error);
         });
     },
-
-
-
-
-
-
     fetchDipendenti() {
-      // Effettua la richiesta al server per ottenere la lista dei dipendenti
-      fetch("http://localhost:8080/api/v1/dipendenti/getalldipendenti")
+      const token = sessionStorage.getItem("token");
+      let url = "http://localhost:8080/api/v1/dipendenti/getalldipendenti";
+
+      fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
         .then((response) => response.json())
         .then((data) => {
           this.dipendentiDisponibili = data;
@@ -209,16 +167,19 @@ this.caricaClienti();
           console.error("Errore durante il recupero dei dipendenti:", error);
         });
     },
-    fetchEventi() {
-      // Effettua la richiesta al server per ottenere la lista degli eventi
-      fetch("http://localhost:8080/api/v1/eventi/getalleventi")
-        .then((response) => response.json())
-        .then((data) => {
-          this.eventi = data;
-        })
-        .catch((error) => {
-          console.error("Errore durante il recupero degli eventi:", error);
-        });
+    increaseQuantity(qualifica) {
+      this.qualificheNecessarie = {
+        ...this.qualificheNecessarie,
+        [qualifica]: this.qualificheNecessarie[qualifica] + 1,
+      };
+    },
+    decreaseQuantity(qualifica) {
+      if (this.qualificheNecessarie[qualifica] > 0) {
+        this.qualificheNecessarie = {
+          ...this.qualificheNecessarie,
+          [qualifica]: this.qualificheNecessarie[qualifica] - 1,
+        };
+      }
     },
     inviaDati() {
       const evento = new Evento(
@@ -229,6 +190,9 @@ this.caricaClienti();
         this.isFesta,
         this.dipendenti
       );
+
+      // Includi il numero di dipendenti nelle informazioni dell'evento
+      evento.numeroDipendenti = this.numeroDipendenti;
 
       // Invio dei dati al server
       fetch("http://localhost:8080/api/v1/eventi/addevento", {
@@ -243,40 +207,90 @@ this.caricaClienti();
             this.mostraConferma = true;
             this.fetchEventi();
           } else {
-            // TODO Gestione dell'errore 
+            // TODO Gestione dell'errore
           }
         })
         .catch((error) => {
           console.error("Errore durante l'invio dei dati evento:", error);
         });
+
+      // Resetta i campi
       this.cliente = "";
       this.data = "";
       this.luogo = "";
       this.descrizione = "";
       this.isFesta = false;
       this.dipendenti = [];
+      this.numeroDipendenti = 0;
+      this.qualificheNecessarie = {
+        BAR: 0,
+        SALA: 0,
+        CUCINA: 0,
+        AUTOMUNITO: 0,
+      };
     },
-    eliminaEvento() {
-      fetch(`http://localhost:8080/api/v1/eventi/deleteevento/${this.eventoId}`, {
-        method: "DELETE",
+    fetchDipendentiDisponibili() {
+      const token = sessionStorage.getItem("token");
+      let url = "http://localhost:8080/api/v1/dipendenti/getalldipendenti";
+
+      if (this.data) {
+        const formattedDate = this.formatDateForApi(this.data);
+        url = `http://localhost:8080/api/v1/dipendenti/getdipendentiindata/${formattedDate}`;
+      }
+
+      fetch(url, {
         headers: {
-          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       })
-        .then((response) => {
-          if (response.ok) {
-            this.mostraEliminaConferma = true;
-            this.fetchEventi();
-          } else {
-            // TODO Gestione dell'errore 
+        .then((response) => response.json())
+        .then((data) => {
+          this.dipendentiDisponibili = data;
+          if (!this.dipendenti || this.dipendenti.length === 0) {
+            this.dipendenti = this.dipendentiDisponibili.map(dipendente => dipendente.id);
           }
         })
         .catch((error) => {
-          console.error("Errore durante l'eliminazione dell'evento:", error);
+          console.error("Errore durante il recupero dei dipendenti:", error);
         });
-      this.eventoId = "";
     },
+    // ... (altri metodi esistenti)
   },
 };
 </script>
 
+<style>
+/* Stili precedenti */
+
+.qualifiche-table table {
+  margin-top: 20px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.qualifiche-table th,
+.qualifiche-table td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+.numero-persone {
+  display: flex;
+  align-items: center;
+}
+
+.decrease-button,
+.increase-button {
+  padding: 5px 10px;
+  font-size: 14px;
+  background-color: #f2f2f2;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.increase-button {
+  margin-left: 5px;
+}
+</style>

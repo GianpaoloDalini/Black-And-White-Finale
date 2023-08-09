@@ -12,5 +12,7 @@ public interface AssenzaRepository extends MongoRepository<Assenza, String> {
     Optional<Assenza> findByData(Date data);
     
     List<Assenza> findByDipendentiContaining(String dipendenteId);
+
+    List<Assenza> findByDipendentiContainingAndData(String dipendenteId, Date data);
     
 }
