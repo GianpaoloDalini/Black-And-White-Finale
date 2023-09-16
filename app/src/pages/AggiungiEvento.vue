@@ -83,16 +83,15 @@
       </div>
     </div>
 
-    <!-- Selezione dipendenti -->
-    <div class="form-group">
-      <label for="dipendenti" class="label">Dipendenti:</label>
-      <div class="input-wrapper">
-        <select id="dipendenti" class="input" multiple v-model="dipendenti">
-          <option v-for="dipendente in dipendentiDisponibili" :key="dipendente.id" :value="dipendente.id">{{ dipendente.nome }}</option>
-        </select>
-      </div>
-    </div>
-
+<!-- Selezione dipendenti -->
+<div class="form-group">
+  <label for="dipendenti" class="label">Dipendenti:</label>
+  <div class="input-wrapper" style="height: 400px; width: 300px; overflow-y: auto;">
+    <select id="dipendenti" class="input" multiple v-model="dipendenti" style="height: 100%; width: 100%;">
+      <option v-for="dipendente in dipendentiDisponibili" :key="dipendente.id" :value="dipendente.id">{{ dipendente.nome }}</option>
+    </select>
+  </div>
+</div>
     <!-- Pulsante di conferma -->
     <button class="button" @click="inviaDati">Conferma</button>
     <span v-if="mostraConferma" class="conferma">Evento aggiunto correttamente!</span>
@@ -289,6 +288,7 @@ export default {
   border-radius: 5px;
   cursor: pointer;
 }
+
 
 .increase-button {
   margin-left: 5px;
