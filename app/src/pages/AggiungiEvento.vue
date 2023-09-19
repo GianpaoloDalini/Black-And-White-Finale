@@ -93,7 +93,7 @@
   </div>
 </div>
     <!-- Pulsante di conferma -->
-    <button class="button" @click="inviaDati">Conferma</button>
+    <button class="button" @click="inviaDatiEvento">Conferma</button>
     <span v-if="mostraConferma" class="conferma">Evento aggiunto correttamente!</span>
 
     <!-- Spazio per scorrere -->
@@ -128,14 +128,13 @@ export default {
     };
   },
   created() {
-    this.caricaClienti();
+    this.fetchClienti();
     this.fetchDipendenti();
-    this.fetchEventi();
+    //this.fetchEventi(); //manca
   },
   methods: {
-    caricaClienti() {
+    fetchClienti() {
       const token = sessionStorage.getItem("token");
-
       fetch("http://localhost:8080/api/v1/clienti/getallclienti", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -151,9 +150,7 @@ export default {
     },
     fetchDipendenti() {
       const token = sessionStorage.getItem("token");
-      let url = "http://localhost:8080/api/v1/dipendenti/getalldipendenti";
-
-      fetch(url, {
+      fetch("http://localhost:8080/api/v1/dipendenti/getalldipendenti", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -180,7 +177,7 @@ export default {
         };
       }
     },
-    inviaDati() {
+    inviaDatiEvento() {
       const evento = new Evento(
         this.cliente,
         this.data,
@@ -192,19 +189,20 @@ export default {
 
       // Includi il numero di dipendenti nelle informazioni dell'evento
       evento.numeroDipendenti = this.numeroDipendenti;
-
+      const token = sessionStorage.getItem("token");
       // Invio dei dati al server
       fetch("http://localhost:8080/api/v1/eventi/addevento", {
         method: "POST",
         body: JSON.stringify(evento),
         headers: {
+          "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       })
         .then((response) => {
           if (response.ok) {
             this.mostraConferma = true;
-            this.fetchEventi();
+            //this.fetchEventi();
           } else {
             // TODO Gestione dell'errore
           }
@@ -232,11 +230,11 @@ export default {
       const token = sessionStorage.getItem("token");
       let url = "http://localhost:8080/api/v1/dipendenti/getalldipendenti";
 
-      if (this.data) {
+     /* if (this.data) {
         const formattedDate = this.formatDateForApi(this.data);
         url = `http://localhost:8080/api/v1/dipendenti/getdipendentiindata/${formattedDate}`;
       }
-
+*/
       fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
