@@ -18,9 +18,9 @@
 
     <!-- Data -->
     <div class="form-group">
-      <label for="data" class="label">Data:</label>
+      <label for="date" class="label">Data:</label>
       <div class="input-wrapper">
-        <input type="date" id="data" class="input" v-model="data" @change="fetchDipendentiDisponibili" />
+        <input type="date" id="date" class="input" v-model="date" @change="fetchDipendentiDisponibili" />
       </div>
     </div>
 
@@ -108,7 +108,7 @@ export default {
   data() {
     return {
       cliente: "",
-      data: "",
+      date: "",
       luogo: "",
       descrizione: "",
       isFesta: false,
@@ -180,7 +180,7 @@ export default {
     inviaDatiEvento() {
       const evento = new Evento(
         this.cliente,
-        this.data,
+        this.date,
         this.luogo,
         this.descrizione,
         this.isFesta,
@@ -213,7 +213,7 @@ export default {
 
       // Resetta i campi
       this.cliente = "";
-      this.data = "";
+      this.date = "";
       this.luogo = "";
       this.descrizione = "";
       this.isFesta = false;
@@ -230,9 +230,9 @@ export default {
       const token = sessionStorage.getItem("token");
       let url = "http://localhost:8080/api/v1/dipendenti/getalldipendenti";
 
-     /* if (this.data) {
-        const formattedDate = this.formatDateForApi(this.data);
-        url = `http://localhost:8080/api/v1/dipendenti/getdipendentiindata/${formattedDate}`;
+     /* if (this.date) {
+        const formattedDate = this.formatDateForApi(this.date);
+        url = `http://localhost:8080/api/v1/dipendenti/getDipendentiDisponibiliInData/${formattedDate}`;
       }
 */
       fetch(url, {
