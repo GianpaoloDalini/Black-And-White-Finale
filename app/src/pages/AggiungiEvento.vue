@@ -40,14 +40,6 @@
       </div>
     </div>
 
-    <!-- È una festa -->
-    <div class="form-group">
-      <label for="isFesta" class="label">È una festa:</label>
-      <div class="input-wrapper">
-        <input type="checkbox" id="isFesta" class="input" v-model="isFesta" />
-      </div>
-    </div>
-
     <!-- Numero di dipendenti -->
     <div class="form-group">
       <label for="numeroDipendenti" class="label">Numero di Dipendenti:</label>
@@ -123,7 +115,6 @@ export default {
         BAR: 0,
         SALA: 0,
         CUCINA: 0,
-        AUTOMUNITO: 0,
       },
     };
   },
@@ -223,7 +214,6 @@ export default {
         BAR: 0,
         SALA: 0,
         CUCINA: 0,
-        AUTOMUNITO: 0,
       };
     },
     fetchDipendentiDisponibili() {
