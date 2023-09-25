@@ -4,12 +4,12 @@ import UserProfile from "@/pages/UserProfile.vue";
 import GestisciDipendenti from "@/pages/GestisciDipendenti.vue";
 import AggiungiEvento from "@/pages/AggiungiEvento.vue";
 import GestisciClienti from "@/pages/GestisciClienti.vue";
-import AggiungiDate from "@/pages/AggiungiDate.vue";
+
 import Ore from "@/pages/Ore.vue";
 import Calendario from "@/pages/Calendario.vue";
 import Icons from "@/pages/Icons.vue";
-import Maps from "@/pages/Maps.vue";
-import Notifications from "@/pages/Notifications.vue";
+
+
 import LoginPage from "@/pages/LoginPage.vue"
 
 const routes = [
@@ -50,14 +50,7 @@ const routes = [
           requiresAuth: true,
         },
       },
-      {
-        path: "aggiungidate",
-        name: "Aggiungi Date",
-        component: AggiungiDate,
-        meta: {
-          requiresAuth: true,
-        },
-      },
+      
       {
         path: "aggiungievento",
         name: "Aggiungi Evento",
@@ -90,32 +83,9 @@ const routes = [
           requiresAuth: true,
         },
       },
-      {
-        path: "icons",
-        name: "Icons",
-        component: Icons,
-        meta: {
-          requiresAuth: true,
-        },
-      },
-      {
-        path: "maps",
-        name: "Maps",
-        meta: {
-          requiresAuth: true,
-          hideFooter: true,
-        },
-        component: Maps,
-      },
-      {
-        path: "notifications",
-        name: "Notifications",
-        component: Notifications,
-        meta: {
-          requiresAuth: true,
-        },
-      },
-
+      
+     
+      
     ],
   },
 ];
