@@ -217,30 +217,32 @@ export default {
       };
     },
     fetchDipendentiDisponibili() {
-      const token = sessionStorage.getItem("token");
-      let url = "http://localhost:8080/api/v1/dipendenti/getalldipendenti";
+  const token = sessionStorage.getItem("token");
+  let url = "http://localhost:8080/api/v1/dipendenti/getalldipendenti";
 
-     /* if (this.date) {
-        const formattedDate = this.formatDateForApi(this.date);
-        url = `http://localhost:8080/api/v1/dipendenti/getDipendentiDisponibiliInData/${formattedDate}`;
-      }
-*/
-      fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          this.dipendentiDisponibili = data;
-          if (!this.dipendenti || this.dipendenti.length === 0) {
-            this.dipendenti = this.dipendentiDisponibili.map(dipendente => dipendente.id);
-          }
-        })
-        .catch((error) => {
-          console.error("Errore durante il recupero dei dipendenti:", error);
-        });
+  if (this.date) {
+    // Formatta la data nel formato richiesto (ad esempio "yyyy-MM-dd")
+    const formattedDate = this.formatDateForApi(this.date);
+    url = `http://localhost:8080/api/v1/dipendenti/getDipendentiDisponibiliInData/${formattedDate}`;
+  }
+
+  fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      this.dipendentiDisponibili = data;
+      if (!this.dipendenti || this.dipendenti.length === 0) {
+        this.dipendenti = this.dipendentiDisponibili.map(dipendente => dipendente.id);
+      }
+    })
+    .catch((error) => {
+      console.error("Errore durante il recupero dei dipendenti:", error);
+    });
+},
+
     // ... (altri metodi esistenti)
   },
 };
