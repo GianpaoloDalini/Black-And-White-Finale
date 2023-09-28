@@ -85,6 +85,14 @@ public class AssenzaController {
         return new ResponseEntity<>(assenze, HttpStatus.OK);
     }
 
+    @GetMapping("/getdipendentiassenti/{data}")
+    @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')|| hasAuthority('DIPENDENTE')")
+        public ResponseEntity<List<String>> getDipendentiAssentiByData(@PathVariable("data") @DateTimeFormat(pattern = "yyyy-MM-dd") Date data) {
+        List<String> dipendentiAssenti = assenzaService.getDipendentiAssentiByData(data);
+        return new ResponseEntity<>(dipendentiAssenti, HttpStatus.OK);
+    }
+
+
     @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')|| hasAuthority('DIPENDENTE')")
     @GetMapping("/getassenzedipendente/{dipendenteId}/bydata")
     public ResponseEntity<List<Assenza>> getAssenzeByDipendenteAndData(

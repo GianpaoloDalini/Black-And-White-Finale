@@ -12,7 +12,7 @@ import java.util.List;
 public class AssenzaService {
 
     @Autowired
-    private AssenzaRepository assenzaRepository;
+    private static AssenzaRepository assenzaRepository;
 
     public List<Assenza> getAllAssenze() {
         return assenzaRepository.findAll();
@@ -83,5 +83,19 @@ public class AssenzaService {
 
     public List<Assenza> getAssenzeByDipendenteAndData(String dipendenteId, Date data) {
         return assenzaRepository.findByDipendentiContainingAndData(dipendenteId, data);
+    }
+
+    public static List<String> getDipendentiAssentiByData(Date data) {
+        List<String> dipendentiAssenti = new ArrayList<>();
+
+        // Cerca l'assenza unica per la data specificata
+        Assenza assenza = assenzaRepository.findByData(data);
+
+        // Se esiste un'assenza per quella data, estrai i dipendenti associati
+        if (assenza != null) {
+            dipendentiAssenti.addAll(assenza.getDipendenti());
+        }
+
+        return dipendentiAssenti;
     }
 }

@@ -1,5 +1,6 @@
 package com.dipendente;
 
+import java.sql.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,15 @@ public class DipendenteController {
         final List<Dipendente> dipendenti = service.getAllDipendenti();
         return new ResponseEntity<>(dipendenti, HttpStatus.OK);
     }
+
+    @GetMapping("/getdipendentibydate/{data}")
+    @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')")
+        public ResponseEntity<List<Dipendente>> getDipendentiByDate(@PathVariable Date data) {
+        // Qui dovresti implementare la logica per recuperare i dipendenti in base alla data specificata
+        List<Dipendente> dipendentiByDate = service.getDipendentiByDate(data);
+        return new ResponseEntity<>(dipendentiByDate, HttpStatus.OK);
+    }
+
 
     @DeleteMapping("/deletedipendente/{id}")
     @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')")

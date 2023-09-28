@@ -46,4 +46,8 @@ public class Assenza {
     public void setDipendenti(List<String> dipendenti) {
         this.dipendenti = dipendenti;
     }
+
+    public Assenza orElse(Object object) {
+        return null;
+    }
 }

@@ -223,7 +223,7 @@ export default {
   if (this.date) {
     // Formatta la data nel formato richiesto (ad esempio "yyyy-MM-dd")
     const formattedDate = this.formatDateForApi(this.date);
-    url = `http://localhost:8080/api/v1/dipendenti/getDipendentiDisponibiliInData/${formattedDate}`;
+    url = `http://localhost:8080/api/v1/dipendenti/getdipendentibydate/${formattedDate}`;
   }
 
   fetch(url, {
