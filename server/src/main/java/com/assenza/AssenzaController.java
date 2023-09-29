@@ -20,6 +20,7 @@ public class AssenzaController {
     @Autowired
     private AssenzaService assenzaService;
 
+    @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')|| hasAuthority('DIPENDENTE')")
     @GetMapping("/getassenzabydata/{data}")
     public ResponseEntity<Assenza> getAssenzaByData(@PathVariable("data") String dataString) {
         try {
