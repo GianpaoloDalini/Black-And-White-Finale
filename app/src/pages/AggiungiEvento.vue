@@ -75,15 +75,16 @@
       </div>
     </div>
 
-<!-- Selezione dipendenti -->
-<div class="form-group">
-  <label for="dipendenti" class="label">Dipendenti:</label>
-  <div class="input-wrapper" style="height: 400px; width: 300px; overflow-y: auto;">
-    <select id="dipendenti" class="input" multiple v-model="dipendenti" style="height: 100%; width: 100%;">
-      <option v-for="dipendente in dipendentiDisponibili" :key="dipendente.id" :value="dipendente.id">{{ dipendente.nome }}</option>
-    </select>
-  </div>
-</div>
+    <!-- Selezione dipendenti -->
+    <div class="form-group">
+      <label for="dipendenti" class="label">Dipendenti:</label>
+      <div class="input-wrapper" style="height: 400px; width: 300px; overflow-y: auto;">
+        <select id="dipendenti" class="input" multiple v-model="dipendenti" style="height: 100%; width: 100%;">
+          <option v-for="dipendente in dipendentiDisponibili" :key="dipendente.id" :value="dipendente.id">{{ dipendente.nome }}</option>
+        </select>
+      </div>
+    </div>
+    
     <!-- Pulsante di conferma -->
     <button class="button" @click="inviaDatiEvento">Conferma</button>
     <span v-if="mostraConferma" class="conferma">Evento aggiunto correttamente!</span>
@@ -100,7 +101,7 @@ export default {
   data() {
     return {
       cliente: "",
-      date: "",
+      date: null, // Modifica: Inizializza a null invece di una stringa vuota
       luogo: "",
       descrizione: "",
       isFesta: false,
@@ -204,7 +205,7 @@ export default {
 
       // Resetta i campi
       this.cliente = "";
-      this.date = "";
+      this.date = null; // Modifica: Reimposta a null
       this.luogo = "";
       this.descrizione = "";
       this.isFesta = false;
@@ -217,33 +218,30 @@ export default {
       };
     },
     fetchDipendentiDisponibili() {
-  const token = sessionStorage.getItem("token");
-  let url = "http://localhost:8080/api/v1/dipendenti/getalldipendenti";
+      const token = sessionStorage.getItem("token");
+      let url = "http://localhost:8080/api/v1/dipendenti/getalldipendenti";
 
-  if (this.date) {
-    // Formatta la data nel formato richiesto (ad esempio "yyyy-MM-dd")
-    const formattedDate = this.formatDateForApi(this.date);
-    url = `http://localhost:8080/api/v1/dipendenti/getdipendentibydate/${formattedDate}`;
-  }
-
-  fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      this.dipendentiDisponibili = data;
-      if (!this.dipendenti || this.dipendenti.length === 0) {
-        this.dipendenti = this.dipendentiDisponibili.map(dipendente => dipendente.id);
+      if (this.date) {
+        // Usa direttamente la data (this.date) nell'URL dell'API
+        url = `http://localhost:8080/api/v1/dipendenti/getdipendentibydate/${this.date.toISOString()}`;
       }
-    })
-    .catch((error) => {
-      console.error("Errore durante il recupero dei dipendenti:", error);
-    });
-},
 
-    // ... (altri metodi esistenti)
+      fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          this.dipendentiDisponibili = data;
+          if (!this.dipendenti || this.dipendenti.length === 0) {
+            this.dipendenti = this.dipendentiDisponibili.map(dipendente => dipendente.id);
+          }
+        })
+        .catch((error) => {
+          console.error("Errore durante il recupero dei dipendenti:", error);
+        });
+    },
   },
 };
 </script>
@@ -278,7 +276,6 @@ export default {
   border-radius: 5px;
   cursor: pointer;
 }
-
 
 .increase-button {
   margin-left: 5px;
