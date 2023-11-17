@@ -75,26 +75,25 @@
       </div>
     </div>
 
-<!-- Selezione dipendenti -->
-<div class="form-group">
-  <label for="dipendenti" class="label">Dipendenti:</label>
-  <div class="input-wrapper" style="height: 400px; width: 300px; overflow-y: auto;">
-    <select id="dipendenti" class="input" multiple v-model="dipendenti" style="height: 100%; width: 100%;">
-      <option v-for="dipendente in allDipendenti" :key="dipendente.id" :value="dipendente.id">{{ dipendente.nome }}</option>
-    </select>
-  </div>
-</div>
+    <!-- Selezione dipendenti -->
+    <div class="form-group">
+      <label for="dipendentiSelezionati" class="label">Dipendenti:</label>
+      <div class="input-wrapper" style="height: 400px; width: 300px; overflow-y: auto;">
+        <select id="dipendentiSelezionati" class="input" multiple v-model="dipendenti" style="height: 100%; width: 100%;">
+          <option v-for="dipendente in allDipendenti" :key="dipendente.id" :value="dipendente.id">{{ dipendente.nome }}</option>
+        </select>
+      </div>
+    </div>
 
-<!-- Selezione dipendenti disponibili in una data -->
-<div class="form-group">
-  <label for="dipendenti" class="label">Dipendenti Disponibili:</label>
-  <div class="input-wrapper" style="height: 400px; width: 300px; overflow-y: auto;">
-    <select id="dipendenti" class="input" multiple v-model="dipendenti" style="height: 100%; width: 100%;">
-      <option v-for="dipendente in dipendentiDisponibili" :key="dipendente.id" :value="dipendente.id">{{ dipendente.nome }}</option>
-    </select>
-  </div>
-</div>
-
+    <!-- Selezione dipendenti disponibili in una data -->
+    <div class="form-group">
+      <label for="dipendentiDisponibili" class="label">Dipendenti Disponibili:</label>
+      <div class="input-wrapper" style="height: 400px; width: 300px; overflow-y: auto;">
+        <select id="dipendentiDisponibili" class="input" multiple v-model="dipendentiDisponibili" style="height: 100%; width: 100%;">
+          <option v-for="dipendente in dipendentiDisponibili" :key="dipendente.id" :value="dipendente.id">{{ dipendente.nome }}</option>
+        </select>
+      </div>
+    </div>
 
     <!-- Pulsante di conferma -->
     <button class="button" @click="inviaDatiEvento">Conferma</button>
@@ -122,6 +121,7 @@ export default {
       clienti: [],
       dipendentiDisponibili: [],
       allDipendenti: [],
+      dipendentiAssenti: [],
       clientiDisponibili: [],
       numeroDipendenti: 0,
       qualificheNecessarie: {
@@ -134,8 +134,7 @@ export default {
   created() {
     this.fetchClienti();
     this.fetchDipendenti();
-    
-    //this.fetchEventi(); //manca
+    // this.fetchEventi(); // Manca
   },
   methods: {
     fetchClienti() {
@@ -145,13 +144,13 @@ export default {
           Authorization: `Bearer ${token}`,
         },
       })
-        .then(response => response.json())
-        .then(data => {
-          this.clienti = data;
-        })
-        .catch(error => {
-          console.error("Errore durante il recupero dei clienti:", error);
-        });
+      .then(response => response.json())
+      .then(data => {
+        this.clienti = data;
+      })
+      .catch(error => {
+        console.error("Errore durante il recupero dei clienti:", error);
+      });
     },
     fetchDipendenti() {
       const token = sessionStorage.getItem("token");
@@ -160,13 +159,13 @@ export default {
           Authorization: `Bearer ${token}`,
         },
       })
-        .then((response) => response.json())
-        .then((data) => {
-          this.allDipendenti = data;
-        })
-        .catch((error) => {
-          console.error("Errore durante il recupero dei dipendenti:", error);
-        });
+      .then((response) => response.json())
+      .then((data) => {
+        this.allDipendenti = data;
+      })
+      .catch((error) => {
+        console.error("Errore durante il recupero dei dipendenti:", error);
+      });
     },
     increaseQuantity(qualifica) {
       this.qualificheNecessarie = {
@@ -192,10 +191,9 @@ export default {
         this.dipendenti
       );
 
-      // Includi il numero di dipendenti nelle informazioni dell'evento
       evento.numeroDipendenti = this.numeroDipendenti;
       const token = sessionStorage.getItem("token");
-      // Invio dei dati al server
+
       fetch("http://localhost:8080/api/v1/eventi/addevento", {
         method: "POST",
         body: JSON.stringify(evento),
@@ -204,19 +202,17 @@ export default {
           "Content-Type": "application/json",
         },
       })
-        .then((response) => {
-          if (response.ok) {
-            this.mostraConferma = true;
-            //this.fetchEventi();
-          } else {
-            // TODO Gestione dell'errore
-          }
-        })
-        .catch((error) => {
-          console.error("Errore durante l'invio dei dati evento:", error);
-        });
+      .then((response) => {
+        if (response.ok) {
+          this.mostraConferma = true;
+        } else {
+          // TODO Gestione dell'errore
+        }
+      })
+      .catch((error) => {
+        console.error("Errore durante l'invio dei dati evento:", error);
+      });
 
-      // Resetta i campi
       this.cliente = "";
       this.date = "";
       this.luogo = "";
@@ -231,65 +227,58 @@ export default {
       };
     },
     formatDateForApi(date) {
-    const formattedDate = new Date(date);
-    const year = formattedDate.getFullYear();
-    let month = (formattedDate.getMonth() + 1).toString();
-    let day = formattedDate.getDate().toString();
+      const formattedDate = new Date(date);
+      const year = formattedDate.getFullYear();
+      let month = (formattedDate.getMonth() + 1).toString();
+      let day = formattedDate.getDate().toString();
 
-    // Aggiungi '0' davanti al mese/giorno se sono composti da un solo carattere
-    if (month.length === 1) {
-      month = `0${month}`;
-    }
-    if (day.length === 1) {
-      day = `0${day}`;
-    }
+      if (month.length === 1) {
+        month = `0${month}`;
+      }
+      if (day.length === 1) {
+        day = `0${day}`;
+      }
 
-    return `${year}-${month}-${day}`;
+      return `${year}-${month}-${day}`;
     },
-  
-   fetchDipendentiDisponibili() {
-    const token = sessionStorage.getItem("token");
-    const formattedDate = this.formatDateForApi(this.date); // Funzione per formattare la data
+    fetchDipendentiDisponibili() {
+  const token = sessionStorage.getItem("token");
+  const formattedDate = this.formatDateForApi(this.date);
 
-    // Fetch per ottenere l'assenza in base alla data
-    fetch(`http://localhost:8080/api/v1/assenze/getassenzabydata/${formattedDate}`, {
+  fetch(`http://localhost:8080/api/v1/assenze/getassenzabydata/${formattedDate}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error('Assenza non trovata');
+    }
+    return response.json();
+  })
+  .then((assenza) => {
+    return fetch(`http://localhost:8080/api/v1/assenze/getassenzedipendente/${assenza.id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Assenza non trovata');
-      }
-      return response.json();
-    })
-    .then((assenza) => {
-      // Ottenuta l'assenza, ora chiamiamo il metodo getDipendenti per ottenere i dipendenti assenti
-      fetch(`http://localhost:8080/api/v1/assenze/getassenzedipendente/${assenza.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Errore nel recupero dei dipendenti assenti');
-        }
-        return response.json();
-      })
-      .then((dipendentiAssenti) => {
-        // Rimuovi i dipendenti assenti dall'array di tutti i dipendenti
-        this.dipendentiDisponibili = this.allDipendenti.filter((dipendente) => !dipendentiAssenti.includes(dipendente.id));
-      })
-      .catch((error) => {
-        console.error("Errore durante il recupero dei dipendenti assenti:", error);
-      });
-    })
-    .catch((error) => {
-      console.error("Errore durante il recupero dell'assenza:", error);
     });
-  }, 
+  })
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error('Errore nel recupero dei dipendenti assenti');
+    }
+    return response.json();
+  })
+  .then((dipendentiAssenti) => {
+    this.dipendentiAssenti = dipendentiAssenti;
+    this.dipendentiDisponibili = this.allDipendenti.filter((dipendente) => !dipendentiAssenti.includes(dipendente.id));
+  })
+  .catch((error) => {
+    console.error("Errore durante il recupero dei dipendenti assenti:", error);
+  });
+},
 
-    // ... (altri metodi esistenti)
+    // ... altri metodi se presenti ...
   },
 };
 </script>
