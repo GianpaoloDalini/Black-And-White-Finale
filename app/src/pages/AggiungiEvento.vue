@@ -230,33 +230,64 @@ export default {
         CUCINA: 0,
       };
     },
-  
-  /* fetchDipendentiDisponibili() {
-  const token = sessionStorage.getItem("token");
-  let url = "http://localhost:8080/api/v1/dipendenti/getalldipendenti";
+    formatDateForApi(date) {
+    const formattedDate = new Date(date);
+    const year = formattedDate.getFullYear();
+    let month = (formattedDate.getMonth() + 1).toString();
+    let day = formattedDate.getDate().toString();
 
-  if (this.date) {
-    // Formatta la data nel formato richiesto (ad esempio "yyyy-MM-dd")
-    const formattedDate = this.formatDateForApi(this.date);
-    url = `http://localhost:8080/api/v1/dipendenti/getDipendentiDisponibiliInData/${formattedDate}`;
-  }
+    // Aggiungi '0' davanti al mese/giorno se sono composti da un solo carattere
+    if (month.length === 1) {
+      month = `0${month}`;
+    }
+    if (day.length === 1) {
+      day = `0${day}`;
+    }
 
-  fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
+    return `${year}-${month}-${day}`;
     },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      this.dipendentiDisponibili = data;
-      if (!this.dipendenti || this.dipendenti.length === 0) {
-        this.dipendenti = this.dipendentiDisponibili.map(dipendente => dipendente.id);
+  
+   fetchDipendentiDisponibili() {
+    const token = sessionStorage.getItem("token");
+    const formattedDate = this.formatDateForApi(this.date); // Funzione per formattare la data
+
+    // Fetch per ottenere l'assenza in base alla data
+    fetch(`http://localhost:8080/api/v1/assenze/getassenzabydata/${formattedDate}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Assenza non trovata');
       }
+      return response.json();
+    })
+    .then((assenza) => {
+      // Ottenuta l'assenza, ora chiamiamo il metodo getDipendenti per ottenere i dipendenti assenti
+      fetch(`http://localhost:8080/api/v1/assenze/getassenzedipendente/${assenza.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Errore nel recupero dei dipendenti assenti');
+        }
+        return response.json();
+      })
+      .then((dipendentiAssenti) => {
+        // Rimuovi i dipendenti assenti dall'array di tutti i dipendenti
+        this.dipendentiDisponibili = this.allDipendenti.filter((dipendente) => !dipendentiAssenti.includes(dipendente.id));
+      })
+      .catch((error) => {
+        console.error("Errore durante il recupero dei dipendenti assenti:", error);
+      });
     })
     .catch((error) => {
-      console.error("Errore durante il recupero dei dipendenti:", error);
+      console.error("Errore durante il recupero dell'assenza:", error);
     });
-}, */
+  }, 
 
     // ... (altri metodi esistenti)
   },
