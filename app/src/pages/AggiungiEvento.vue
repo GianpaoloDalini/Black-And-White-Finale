@@ -20,7 +20,7 @@
     <div class="form-group">
       <label for="date" class="label">Data:</label>
       <div class="input-wrapper">
-        <input type="date" id="date" class="input" v-model="date" @change="fetchDipendentiDisponibili" />
+        <input type="date" id="date" class="input" v-model="date"  @change="fetchDipendenti(); fetchDipendentiDisponibili();" />
       </div>
     </div>
 
@@ -80,10 +80,22 @@
   <label for="dipendenti" class="label">Dipendenti:</label>
   <div class="input-wrapper" style="height: 400px; width: 300px; overflow-y: auto;">
     <select id="dipendenti" class="input" multiple v-model="dipendenti" style="height: 100%; width: 100%;">
+      <option v-for="dipendente in allDipendenti" :key="dipendente.id" :value="dipendente.id">{{ dipendente.nome }}</option>
+    </select>
+  </div>
+</div>
+
+<!-- Selezione dipendenti disponibili in una data -->
+<div class="form-group">
+  <label for="dipendenti" class="label">Dipendenti Disponibili:</label>
+  <div class="input-wrapper" style="height: 400px; width: 300px; overflow-y: auto;">
+    <select id="dipendenti" class="input" multiple v-model="dipendenti" style="height: 100%; width: 100%;">
       <option v-for="dipendente in dipendentiDisponibili" :key="dipendente.id" :value="dipendente.id">{{ dipendente.nome }}</option>
     </select>
   </div>
 </div>
+
+
     <!-- Pulsante di conferma -->
     <button class="button" @click="inviaDatiEvento">Conferma</button>
     <span v-if="mostraConferma" class="conferma">Evento aggiunto correttamente!</span>
@@ -109,6 +121,7 @@ export default {
       eventi: [],
       clienti: [],
       dipendentiDisponibili: [],
+      allDipendenti: [],
       clientiDisponibili: [],
       numeroDipendenti: 0,
       qualificheNecessarie: {
@@ -121,6 +134,7 @@ export default {
   created() {
     this.fetchClienti();
     this.fetchDipendenti();
+    
     //this.fetchEventi(); //manca
   },
   methods: {
@@ -148,7 +162,7 @@ export default {
       })
         .then((response) => response.json())
         .then((data) => {
-          this.dipendentiDisponibili = data;
+          this.allDipendenti = data;
         })
         .catch((error) => {
           console.error("Errore durante il recupero dei dipendenti:", error);
@@ -216,7 +230,8 @@ export default {
         CUCINA: 0,
       };
     },
-    fetchDipendentiDisponibili() {
+  
+  /* fetchDipendentiDisponibili() {
   const token = sessionStorage.getItem("token");
   let url = "http://localhost:8080/api/v1/dipendenti/getalldipendenti";
 
@@ -241,7 +256,7 @@ export default {
     .catch((error) => {
       console.error("Errore durante il recupero dei dipendenti:", error);
     });
-},
+}, */
 
     // ... (altri metodi esistenti)
   },
