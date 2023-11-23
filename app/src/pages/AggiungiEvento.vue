@@ -265,30 +265,25 @@ export default {
     return response.json();
   })
   .then((assenza) => {
-    return fetch(`http://localhost:8080/api/v1/assenze/getassenzedipendente/${assenza.id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  })
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error('Errore nel recupero dei dipendenti assenti');
-    }
-    return response.json();
-  })
-  .then((dipendentiAssenti) => {
-    this.dipendentiAssenti = dipendentiAssenti;
-    this.dipendentiDisponibili = this.allDipendenti.filter((dipendente) => !dipendentiAssenti.includes(dipendente.id));
+    // Estrai gli ID dei dipendenti assenti dall'oggetto assenza
+    const idDipendentiAssenti = assenza.dipendenti;
 
-    // Output dopo l'aggiornamento dei dati
-    console.log('Dipendenti Assenti dopo il fetch:', JSON.stringify(this.dipendentiAssenti, null, 2));
-    console.log('Dipendenti Disponibili dopo il fetch:', JSON.stringify(this.dipendentiDisponibili, null, 2));
+    // Filtra gli allDipendenti escludendo quelli presenti tra i dipendenti assenti
+    this.dipendentiAssenti = this.allDipendenti.filter((dipendente) => idDipendentiAssenti.includes(dipendente.id));
+
+    // Ottieni i dipendenti disponibili rimuovendo i dipendenti assenti da allDipendenti
+    this.dipendentiDisponibili = this.allDipendenti.filter((dipendente) => !idDipendentiAssenti.includes(dipendente.id));
+
+    // Output per verificare i dati ottenuti
+    console.log('Dipendenti Assenti:', JSON.stringify(this.dipendentiAssenti, null, 2));
+    console.log('Dipendenti Disponibili:', JSON.stringify(this.dipendentiDisponibili, null, 2));
   })
   .catch((error) => {
     console.error("Errore durante il recupero dei dipendenti assenti:", error);
   });
 }
+
+
 
 
     // ... altri metodi se presenti ...
