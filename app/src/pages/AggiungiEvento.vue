@@ -20,7 +20,7 @@
     <div class="form-group">
       <label for="date" class="label">Data:</label>
       <div class="input-wrapper">
-        <input type="date" id="date" class="input" v-model="date"  @change="fetchDipendenti(); fetchDipendentiDisponibili();" />
+        <input type="date" id="date" class="input" v-model="date"  @change="fetchDipendentiDisponibili();" />
       </div>
     </div>
 
@@ -75,25 +75,24 @@
       </div>
     </div>
 
-    <!-- Selezione dipendenti -->
     <div class="form-group">
-      <label for="dipendentiSelezionati" class="label">Dipendenti:</label>
-      <div class="input-wrapper" style="height: 400px; width: 300px; overflow-y: auto;">
-        <select id="dipendentiSelezionati" class="input" multiple v-model="dipendenti" style="height: 100%; width: 100%;">
-          <option v-for="dipendente in allDipendenti" :key="dipendente.id" :value="dipendente.id">{{ dipendente.nome }}</option>
-        </select>
-      </div>
-    </div>
+  <label for="dipendentiSelezionati" class="label">Dipendenti:</label>
+  <div class="input-wrapper" style="height: 400px; width: 300px; overflow-y: auto;">
+    <select id="dipendentiSelezionati" class="input" multiple v-model="dipendentiSelezionati" style="height: 100%; width: 100%;">
+      <option v-for="dipendente in allDipendenti" :key="dipendente.id" :value="dipendente.id">{{ dipendente.nome }}</option>
+    </select>
+  </div>
+</div>
 
     <!-- Selezione dipendenti disponibili in una data -->
-    <div class="form-group">
-      <label for="dipendentiDisponibili" class="label">Dipendenti Disponibili:</label>
-      <div class="input-wrapper" style="height: 400px; width: 300px; overflow-y: auto;">
-        <select id="dipendentiDisponibili" class="input" multiple v-model="dipendentiDisponibili" style="height: 100%; width: 100%;">
-          <option v-for="dipendente in dipendentiDisponibili" :key="dipendente.id" :value="dipendente.id">{{ dipendente.nome }}</option>
-        </select>
-      </div>
-    </div>
+<div class="form-group">
+  <label for="dipendentiDisponibiliSelezionati" class="label">Dipendenti Disponibili:</label>
+  <div class="input-wrapper" style="height: 400px; width: 300px; overflow-y: auto;">
+    <select id="dipendentiDisponibiliSelezionati" class="input" multiple v-model="dipendentiDisponibiliSelezionati" style="height: 100%; width: 100%;">
+      <option v-for="dipendente in dipendentiDisponibili" :key="dipendente.id" :value="dipendente.id">{{ dipendente.nome }}</option>
+    </select>
+  </div>
+</div>
 
     <!-- Pulsante di conferma -->
     <button class="button" @click="inviaDatiEvento">Conferma</button>
@@ -121,6 +120,8 @@ export default {
       clienti: [],
       dipendentiDisponibili: [],
       allDipendenti: [],
+      dipendentiSelezionati: [],
+      dipendentiDisponibiliSelezionati: [],
       dipendentiAssenti: [],
       clientiDisponibili: [],
       numeroDipendenti: 0,
@@ -153,6 +154,7 @@ export default {
       });
     },
     fetchDipendenti() {
+      console.log('Chiamata a fetchDipendenti()');
       const token = sessionStorage.getItem("token");
       fetch("http://localhost:8080/api/v1/dipendenti/getalldipendenti", {
         headers: {
@@ -166,6 +168,7 @@ export default {
       .catch((error) => {
         console.error("Errore durante il recupero dei dipendenti:", error);
       });
+
     },
     increaseQuantity(qualifica) {
       this.qualificheNecessarie = {
@@ -227,6 +230,7 @@ export default {
       };
     },
     formatDateForApi(date) {
+      console.log('Chiamata a formatDateForApi');
       const formattedDate = new Date(date);
       const year = formattedDate.getFullYear();
       let month = (formattedDate.getMonth() + 1).toString();
@@ -238,10 +242,14 @@ export default {
       if (day.length === 1) {
         day = `0${day}`;
       }
+      console.log('Data:', `${year}-${month}-${day}` );
 
       return `${year}-${month}-${day}`;
+      
     },
     fetchDipendentiDisponibili() {
+  console.log('Chiamata a fetchDipendentiDisponibili()');
+
   const token = sessionStorage.getItem("token");
   const formattedDate = this.formatDateForApi(this.date);
 
@@ -272,11 +280,16 @@ export default {
   .then((dipendentiAssenti) => {
     this.dipendentiAssenti = dipendentiAssenti;
     this.dipendentiDisponibili = this.allDipendenti.filter((dipendente) => !dipendentiAssenti.includes(dipendente.id));
+
+    // Output dopo l'aggiornamento dei dati
+    console.log('Dipendenti Assenti dopo il fetch:', JSON.stringify(this.dipendentiAssenti, null, 2));
+    console.log('Dipendenti Disponibili dopo il fetch:', JSON.stringify(this.dipendentiDisponibili, null, 2));
   })
   .catch((error) => {
     console.error("Errore durante il recupero dei dipendenti assenti:", error);
   });
-},
+}
+
 
     // ... altri metodi se presenti ...
   },
