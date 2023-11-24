@@ -84,15 +84,23 @@
   </div>
 </div>
 
-    <!-- Selezione dipendenti disponibili in una data -->
 <div class="form-group">
   <label for="dipendentiDisponibiliSelezionati" class="label">Dipendenti Disponibili:</label>
   <div class="input-wrapper" style="height: 400px; width: 300px; overflow-y: auto;">
     <select id="dipendentiDisponibiliSelezionati" class="input" multiple v-model="dipendentiDisponibiliSelezionati" style="height: 100%; width: 100%;">
-      <option v-for="dipendente in dipendentiDisponibili" :key="dipendente.id" :value="dipendente.id">{{ dipendente.nome }}</option>
+      <!-- Mostra prima i dipendenti assenti -->
+      <option v-for="dipendente in dipendentiAssenti" :key="dipendente.id" :value="dipendente.id" style="color: red;">
+        {{ dipendente.nome }}
+      </option>
+      <!-- Poi mostra i dipendenti disponibili -->
+      <option v-for="dipendente in dipendentiDisponibili" :key="dipendente.id" :value="dipendente.id">
+        {{ dipendente.nome }}
+      </option>
     </select>
   </div>
 </div>
+
+
 
     <!-- Pulsante di conferma -->
     <button class="button" @click="inviaDatiEvento">Conferma</button>
