@@ -37,6 +37,17 @@ public class DipendenteController {
         return new ResponseEntity<>(dipendenti, HttpStatus.OK);
     }
 
+    @GetMapping("/getdipendente/{id}")
+    @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')")
+    public ResponseEntity<Dipendente> getDipendenteById(@PathVariable String id) {
+    Dipendente dipendente = service.getDipendenteById(id);
+    if (dipendente != null) {
+        return new ResponseEntity<>(dipendente, HttpStatus.OK);
+    } else {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+}
+
     @DeleteMapping("/deletedipendente/{id}")
     @PreAuthorize("hasAuthority('PROPRIETARIO') || hasAuthority('REFERENTE')")
     public ResponseEntity<String> deleteDipendente(@PathVariable String id) {
