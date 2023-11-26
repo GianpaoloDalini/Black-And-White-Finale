@@ -20,7 +20,7 @@
     <div class="form-group">
       <label for="date" class="label">Data:</label>
       <div class="input-wrapper">
-        <input type="date" id="date" class="input" v-model="date"  @change="fetchDipendentiDisponibili();" />
+        <input type="date" id="date" class="input" v-model="date"  @change="fetchDipendentiDisponibili(); fetchEventiByDate()" />
       </div>
     </div>
 
@@ -192,6 +192,35 @@ export default {
         };
       }
     },
+
+    fetchEventiByDate() {
+    console.log('Chiamata a fetchEventiByDate()');
+
+    const token = sessionStorage.getItem('token');
+    const formattedDate = this.formatDateForApi(this.date);
+
+    fetch(`http://localhost:8080/api/v1/eventi/geteventibydate/${formattedDate}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Eventi non trovati');
+        }
+        return response.json();
+      })
+      .then((eventi) => {
+        this.eventi = eventi; // Aggiorna la lista degli eventi con quelli ottenuti dalla chiamata API
+        console.log('Eventi ottenuti:', JSON.stringify(this.eventi, null, 2));
+
+        // Aggiungi il log finale qui per mostrare il contenuto degli eventi dopo l'aggiornamento
+        console.log('Contenuto degli eventi dopo l\'aggiornamento:', JSON.stringify(this.eventi, null, 2));
+      })
+      .catch((error) => {
+        console.error("Errore durante il recupero degli eventi:", error);
+      });
+  },
 
 inviaDatiEvento() {
   console.log('Chiamata a inviaDatiEvento()');
