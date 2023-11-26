@@ -103,7 +103,7 @@
 
 
     <!-- Pulsante di conferma -->
-    <button class="button" @click="inviaDatiEvento">Conferma</button>
+    <button class="button" @click="inviaDatiEvento()">Conferma</button>
     <span v-if="mostraConferma" class="conferma">Evento aggiunto correttamente!</span>
 
     <!-- Spazio per scorrere -->
@@ -192,51 +192,72 @@ export default {
         };
       }
     },
-    inviaDatiEvento() {
-      const evento = new Evento(
-        this.cliente,
-        this.date,
-        this.luogo,
-        this.descrizione,
-        this.isFesta,
-        this.dipendenti
-      );
 
-      evento.numeroDipendenti = this.numeroDipendenti;
-      const token = sessionStorage.getItem("token");
+inviaDatiEvento() {
+  console.log('Chiamata a inviaDatiEvento()');
 
-      fetch("http://localhost:8080/api/v1/eventi/addevento", {
-        method: "POST",
-        body: JSON.stringify(evento),
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-        if (response.ok) {
-          this.mostraConferma = true;
-        } else {
-          // TODO Gestione dell'errore
-        }
-      })
-      .catch((error) => {
-        console.error("Errore durante l'invio dei dati evento:", error);
-      });
+  // Ottieni il numero di dipendenti specificato nel form
+  const numDipendentiDaSelezionare = this.numeroDipendenti;
+  console.log('Numero dipendenti specificati nel form:', numDipendentiDaSelezionare);
 
-      this.cliente = "";
-      this.date = "";
-      this.luogo = "";
-      this.descrizione = "";
-      this.isFesta = false;
-      this.dipendenti = [];
-      this.numeroDipendenti = 0;
-      this.qualificheNecessarie = {
-        BAR: 0,
-        SALA: 0,
-        CUCINA: 0,
-      };
+  // Estrai gli ID dei dipendenti selezionati
+  const dipendentiIDs = this.dipendentiDisponibili
+    .slice(0, numDipendentiDaSelezionare)
+    .map(dipendente => dipendente.id); // Supponendo che gli ID siano presenti nella proprietà 'id'
+
+  // Crea l'oggetto 'evento' con i dati raccolti dal form, incluso solo gli ID dei dipendenti
+  const evento = {
+    cliente: this.cliente,
+    data: this.date,
+    luogo: this.luogo,
+    descrizione: this.descrizione,
+    isFesta: this.isFesta,
+    dipendenti: dipendentiIDs, // Passa solo gli ID dei dipendenti
+    numeroDipendenti: this.numeroDipendenti,
+    qualificheNecessarie: this.qualificheNecessarie,
+  };
+
+  // Mostra l'oggetto 'evento' in formato JSON tramite console.log
+  console.log('Dati dell\'evento da inviare:', JSON.stringify(evento));
+
+  const token = sessionStorage.getItem("token");
+
+  fetch("http://localhost:8080/api/v1/eventi/addevento", {
+    method: "POST",
+    body: JSON.stringify(evento),
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json",
     },
+  })
+  .then((response) => {
+    if (response.ok) {
+      this.mostraConferma = true;
+    } else {
+      // TODO Gestione dell'errore
+    }
+  })
+  .catch((error) => {
+    console.error("Errore durante l'invio dei dati evento:", error);
+  });
+
+  // Resetta i campi del form
+  this.cliente = "";
+  this.date = "";
+  this.luogo = "";
+  this.descrizione = "";
+  this.isFesta = false;
+  this.dipendenti = [];
+  this.numeroDipendenti = 0;
+  this.qualificheNecessarie = {
+    BAR: 0,
+    SALA: 0,
+    CUCINA: 0,
+  };
+},
+
+
+
     formatDateForApi(date) {
       console.log('Chiamata a formatDateForApi');
       const formattedDate = new Date(date);
@@ -283,8 +304,8 @@ export default {
     this.dipendentiDisponibili = this.allDipendenti.filter((dipendente) => !idDipendentiAssenti.includes(dipendente.id));
 
     // Output per verificare i dati ottenuti
-    console.log('Dipendenti Assenti:', JSON.stringify(this.dipendentiAssenti, null, 2));
-    console.log('Dipendenti Disponibili:', JSON.stringify(this.dipendentiDisponibili, null, 2));
+    //console.log('Dipendenti Assenti:', JSON.stringify(this.dipendentiAssenti, null, 2));
+    //console.log('Dipendenti Disponibili:', JSON.stringify(this.dipendentiDisponibili, null, 2));
   })
   .catch((error) => {
     console.error("Errore durante il recupero dei dipendenti assenti:", error);
