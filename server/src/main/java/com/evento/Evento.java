@@ -21,14 +21,16 @@ public class Evento {
     private LocalDate data;
     private String luogo;
     private String descrizione;
+    private boolean isFesta;
     private List<String> dipendenti;
 
-    public Evento(String cliente, LocalDate data, String luogo, String descrizione, List<String> dipendenti) {
+    public Evento(String cliente, LocalDate data, String luogo, String descrizione, boolean isFesta, List<String> dipendenti) {
         this.id = generateRandomId();
         this.cliente = cliente;
         this.data = data;
         this.luogo = luogo;
         this.descrizione = descrizione;
+        this.isFesta = isFesta;
         this.dipendenti = dipendenti;
     }
     private String generateRandomId() {

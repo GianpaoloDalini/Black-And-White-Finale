@@ -103,9 +103,8 @@
 
 
     <!-- Pulsante di conferma -->
-<button class="button" @click="inviaDatiEvento">Conferma</button>
-<span v-if="mostraConferma" class="conferma">Evento aggiunto correttamente!</span>
-
+    <button class="button" @click="inviaDatiEvento">Conferma</button>
+    <span v-if="mostraConferma" class="conferma">Evento aggiunto correttamente!</span>
 
     <!-- Spazio per scorrere -->
     <div style="height: 1000px;"></div>
@@ -122,6 +121,7 @@ export default {
       date: "",
       luogo: "",
       descrizione: "",
+      isFesta: false,
       dipendenti: [],
       mostraConferma: false,
       eventi: [],
@@ -193,54 +193,50 @@ export default {
       }
     },
     inviaDatiEvento() {
-      console.log('Chiamata a inviaDatiEvento');
-  // Recupera i primi 'numeroDipendenti' dipendenti disponibili
-  const dipendentiSelezionati = this.dipendentiDisponibili.slice(0, this.numeroDipendenti);
-  
-  // Crea un oggetto evento con i dati del form
-  const evento = new Evento(
-    this.cliente,
-    this.date,
-    this.luogo,
-    this.descrizione,
-    dipendentiSelezionati  // Passa i dipendenti selezionati all'evento
-  );
+      const evento = new Evento(
+        this.cliente,
+        this.date,
+        this.luogo,
+        this.descrizione,
+        this.isFesta,
+        this.dipendenti
+      );
 
-  console.log('Dati dell\'evento da inviare:', JSON.stringify(evento));
+      evento.numeroDipendenti = this.numeroDipendenti;
+      const token = sessionStorage.getItem("token");
 
-  // Effettua la richiesta POST con l'oggetto evento
-  const token = sessionStorage.getItem("token");
-  fetch("http://localhost:8080/api/v1/eventi/addevento", {
-    method: "POST",
-    body: JSON.stringify(evento),
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json",
+      fetch("http://localhost:8080/api/v1/eventi/addevento", {
+        method: "POST",
+        body: JSON.stringify(evento),
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        if (response.ok) {
+          this.mostraConferma = true;
+        } else {
+          // TODO Gestione dell'errore
+        }
+      })
+      .catch((error) => {
+        console.error("Errore durante l'invio dei dati evento:", error);
+      });
+
+      this.cliente = "";
+      this.date = "";
+      this.luogo = "";
+      this.descrizione = "";
+      this.isFesta = false;
+      this.dipendenti = [];
+      this.numeroDipendenti = 0;
+      this.qualificheNecessarie = {
+        BAR: 0,
+        SALA: 0,
+        CUCINA: 0,
+      };
     },
-  })
-  .then((response) => {
-    if (response.ok) {
-      this.mostraConferma = true;
-    } else {
-      // TODO Gestione dell'errore
-    }
-  })
-  .catch((error) => {
-    console.error("Errore durante l'invio dei dati evento:", error);
-  });
-
-  // Resetta i campi del form dopo l'invio
-  this.cliente = "";
-  this.date = "";
-  this.luogo = "";
-  this.descrizione = "";
-  this.numeroDipendenti = 0;
-  this.qualificheNecessarie = {
-    BAR: 0,
-    SALA: 0,
-    CUCINA: 0,
-  };
-},
     formatDateForApi(date) {
       console.log('Chiamata a formatDateForApi');
       const formattedDate = new Date(date);
