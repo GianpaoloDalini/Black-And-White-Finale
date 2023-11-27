@@ -20,7 +20,7 @@
     <div class="form-group">
       <label for="date" class="label">Data:</label>
       <div class="input-wrapper">
-        <input type="date" id="date" class="input" v-model="date"  @change="fetchDipendentiDisponibili(); fetchEventiByDate(); fetchDipendentiOccupati()" />
+        <input type="date" id="date" class="input" v-model="date"  @change="fetchEventiByDate(); fetchDipendentiOccupati()" />
       </div>
     </div>
 
@@ -90,6 +90,10 @@
     <select id="dipendentiDisponibiliSelezionati" class="input" multiple v-model="dipendentiDisponibiliSelezionati" style="height: 100%; width: 100%;">
       <!-- Mostra prima i dipendenti assenti -->
       <option v-for="dipendente in dipendentiAssenti" :key="dipendente.id" :value="dipendente.id" style="color: red;">
+        {{ dipendente.nome }}
+      </option>
+      <!-- Poi mostra i dipendenti occupati -->
+      <option v-for="dipendente in dipendentiOccupati" :key="dipendente.id" :value="dipendente.id" style="color: green;">
         {{ dipendente.nome }}
       </option>
       <!-- Poi mostra i dipendenti disponibili -->
@@ -193,73 +197,69 @@ export default {
         };
       }
     },
-
     fetchDipendentiOccupati() {
-  console.log('Chiamata a fetchDipendentiOccupati()');
+    console.log('Chiamata a fetchDipendentiOccupati()');
 
-  const token = sessionStorage.getItem("token");
-  const formattedDate = this.formatDateForApi(this.date);
+    const token = sessionStorage.getItem('token');
+    const formattedDate = this.formatDateForApi(this.date);
 
-  // Array per memorizzare gli ID dei dipendenti occupati
-  const idDipendentiOccupati = [];
+    fetch(`http://localhost:8080/api/v1/eventi/geteventibydate/${formattedDate}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Eventi non trovati');
+      }
+      return response.json();
+    })
+    .then((eventi) => {
+      const idDipendentiOccupati = [];
 
-  fetch(`http://localhost:8080/api/v1/eventi/geteventibydate/${formattedDate}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error('Eventi non trovati');
-    }
-    return response.json();
-  })
-  .then((eventi) => {
-    // Scansione degli eventi per ottenere gli ID dei dipendenti che lavorano
-    eventi.forEach((evento) => {
-      evento.dipendenti.forEach((idDipendente) => {
-        // Aggiunta dell'ID del dipendente all'array idDipendentiOccupati
-        idDipendentiOccupati.push(idDipendente);
+      eventi.forEach((evento) => {
+        evento.dipendenti.forEach((idDipendente) => {
+          idDipendentiOccupati.push(idDipendente);
+        });
       });
-    });
 
-    // Output in formato JSON degli ID dei dipendenti occupati
-    console.log('ID dei Dipendenti Occupati:', JSON.stringify(idDipendentiOccupati));
+      console.log('ID dei Dipendenti Occupati:', JSON.stringify(idDipendentiOccupati));
 
-    // Array per memorizzare i dettagli dei dipendenti occupati
-    const dipendentiOccupati = [];
+      const dipendentiPromises = [];
 
-    // Scansione degli ID dei dipendenti occupati per recuperare i dettagli dei dipendenti
-    idDipendentiOccupati.forEach((idDipendente) => {
-      fetch(`http://localhost:8080/api/v1/dipendenti/getdipendente/${idDipendente}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Dipendente non trovato');
-        }
-        return response.json();
-      })
-      .then((dipendente) => {
-        dipendentiOccupati.push(dipendente); // Aggiungi il dipendente all'array dipendentiOccupati
-      })
-      .catch((error) => {
-        console.error("Errore durante il recupero dei dettagli del dipendente:", error);
+      idDipendentiOccupati.forEach((idDipendente) => {
+        const dipendentePromise = fetch(`http://localhost:8080/api/v1/dipendenti/getdipendente/${idDipendente}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Dipendente non trovato');
+          }
+          return response.json();
+        })
+        .catch((error) => {
+          console.error("Errore durante il recupero dei dettagli del dipendente:", error);
+          return null;
+        });
+
+        dipendentiPromises.push(dipendentePromise);
       });
+
+      Promise.all(dipendentiPromises)
+        .then((dipendentiOccupati) => {
+          this.dipendentiOccupati = dipendentiOccupati.filter((dipendente) => dipendente !== null);
+          console.log('Dipendenti Occupati:', JSON.stringify(this.dipendentiOccupati));
+
+          // Chiamata a fetchDipendentiDisponibili dopo aver recuperato i dipendenti occupati
+          this.fetchDipendentiDisponibili();
+        });
+    })
+    .catch((error) => {
+      console.error("Errore durante il recupero degli eventi:", error);
     });
-
-    // Output in formato JSON dei dettagli dei dipendenti occupati
-    console.log('Dipendenti Occupati:', JSON.stringify(dipendentiOccupati));
-  })
-  .catch((error) => {
-    console.error("Errore durante il recupero degli eventi:", error);
-  });
-},
-
-
-
+  },
     fetchEventiByDate() {
     console.log('Chiamata a fetchEventiByDate()');
 
@@ -288,7 +288,6 @@ export default {
         console.error("Errore durante il recupero degli eventi:", error);
       });
   },
-
 inviaDatiEvento() {
   console.log('Chiamata a inviaDatiEvento()');
 
@@ -351,9 +350,6 @@ inviaDatiEvento() {
     CUCINA: 0,
   };
 },
-
-
-
     formatDateForApi(date) {
       console.log('Chiamata a formatDateForApi');
       const formattedDate = new Date(date);
@@ -375,7 +371,7 @@ inviaDatiEvento() {
     fetchDipendentiDisponibili() {
   console.log('Chiamata a fetchDipendentiDisponibili()');
 
-  const token = sessionStorage.getItem("token");
+  const token = sessionStorage.getItem('token');
   const formattedDate = this.formatDateForApi(this.date);
 
   fetch(`http://localhost:8080/api/v1/assenze/getassenzabydata/${formattedDate}`, {
@@ -396,17 +392,20 @@ inviaDatiEvento() {
     // Filtra gli allDipendenti escludendo quelli presenti tra i dipendenti assenti
     this.dipendentiAssenti = this.allDipendenti.filter((dipendente) => idDipendentiAssenti.includes(dipendente.id));
 
-    // Ottieni i dipendenti disponibili rimuovendo i dipendenti assenti da allDipendenti
-    this.dipendentiDisponibili = this.allDipendenti.filter((dipendente) => !idDipendentiAssenti.includes(dipendente.id));
-
+    // Rimuovi i dipendenti occupati dai dipendenti disponibili
+    this.dipendentiDisponibili = this.allDipendenti.filter(
+      (dipendente) => !idDipendentiAssenti.includes(dipendente.id) && !this.dipendentiOccupati.map((d) => d.id).includes(dipendente.id)
+    );
+    
     // Output per verificare i dati ottenuti
-    //console.log('Dipendenti Assenti:', JSON.stringify(this.dipendentiAssenti, null, 2));
-    //console.log('Dipendenti Disponibili:', JSON.stringify(this.dipendentiDisponibili, null, 2));
+    // console.log('Dipendenti Assenti:', JSON.stringify(this.dipendentiAssenti, null, 2));
+    // console.log('Dipendenti Disponibili:', JSON.stringify(this.dipendentiDisponibili, null, 2));
   })
   .catch((error) => {
     console.error("Errore durante il recupero dei dipendenti assenti:", error);
   });
 }
+
 
 
 
