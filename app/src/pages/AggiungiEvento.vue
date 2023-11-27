@@ -259,7 +259,7 @@ export default {
     .catch((error) => {
       console.error("Errore durante il recupero degli eventi:", error);
     });
-  },
+    },
     fetchEventiByDate() {
     console.log('Chiamata a fetchEventiByDate()');
 
@@ -287,8 +287,8 @@ export default {
       .catch((error) => {
         console.error("Errore durante il recupero degli eventi:", error);
       });
-  },
-inviaDatiEvento() {
+    },
+    inviaDatiEvento() {
   console.log('Chiamata a inviaDatiEvento()');
 
   // Ottieni il numero di dipendenti specificato nel form
@@ -349,8 +349,8 @@ inviaDatiEvento() {
     SALA: 0,
     CUCINA: 0,
   };
-},
-    formatDateForApi(date) {
+    },
+   formatDateForApi(date) {
       console.log('Chiamata a formatDateForApi');
       const formattedDate = new Date(date);
       const year = formattedDate.getFullYear();
@@ -367,8 +367,8 @@ inviaDatiEvento() {
 
       return `${year}-${month}-${day}`;
       
-    },
-    fetchDipendentiDisponibili() {
+   },
+   fetchDipendentiDisponibili() {
   console.log('Chiamata a fetchDipendentiDisponibili()');
 
   const token = sessionStorage.getItem('token');
@@ -404,13 +404,44 @@ inviaDatiEvento() {
   .catch((error) => {
     console.error("Errore durante il recupero dei dipendenti assenti:", error);
   });
-}
+   },
+    Algoritmo() {
+      ////////////////////////////////////// STEP 1 ///////////////////////////////
+    // Filtra i dipendenti non assenti
+    const dipendentiNonAssenti = this.allDipendenti.filter(dipendente => !this.dipendentiAssenti.map(d => d.id).includes(dipendente.id));
+    // Ordina i dipendenti non assenti in base al numero di qualifiche che possiedono (in ordine decrescente)
+    dipendentiNonAssenti.sort((a, b) => {
+      // Ordina in modo decrescente: dal dipendente con più qualifiche a quello con meno
+      return b.qualifiche.length - a.qualifiche.length;
+    });
+      //////////////////////////////////// STEP 2 ////////////////////////////////
+// Creiamo una matrice vuota per rappresentare la compatibilità tra dipendenti e ruoli (qualifiche)
+const matriceCompatibilita = [];
+
+// Per ogni dipendente, creiamo una riga nella matrice di compatibilità
+dipendentiNonAssenti.forEach((dipendente) => {
+  const compatibilitaDipendente = [];
+
+  // Per ciascuna qualifica (ruolo), verifichiamo se il dipendente possiede quella competenza
+  const qualificheDipendente = dipendente.qualifiche; // Supponiamo che 'qualifiche' sia un array contenente le qualifiche del dipendente
+  const qualificheDisponibili = ['BAR', 'SALA', 'CUCINA']; // Elenco delle qualifiche possibili
+
+  qualificheDisponibili.forEach((qualifica) => {
+    // Verifichiamo se il dipendente possiede quella qualifica/ruolo
+    const eCompetente = qualificheDipendente.includes(qualifica);
+
+    // Se il dipendente è competente per la qualifica/ruolo, impostiamo a true (1), altrimenti a false (0)
+    compatibilitaDipendente.push(eCompetente ? 1 : 0);
+  });
+
+  // Aggiungi la riga di compatibilità del dipendente alla matrice
+  matriceCompatibilita.push(compatibilitaDipendente);
+});
+//////////////////////////////////// STEP 3 ////////////////////////////////
 
 
+  },
 
-
-
-    // ... altri metodi se presenti ...
   },
 };
 </script>
