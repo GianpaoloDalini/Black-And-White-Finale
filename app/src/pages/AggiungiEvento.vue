@@ -405,42 +405,59 @@ export default {
     console.error("Errore durante il recupero dei dipendenti assenti:", error);
   });
    },
-    Algoritmo() {
-      ////////////////////////////////////// STEP 1 ///////////////////////////////
-    // Filtra i dipendenti non assenti
-    const dipendentiNonAssenti = this.allDipendenti.filter(dipendente => !this.dipendentiAssenti.map(d => d.id).includes(dipendente.id));
-    // Ordina i dipendenti non assenti in base al numero di qualifiche che possiedono (in ordine decrescente)
-    dipendentiNonAssenti.sort((a, b) => {
-      // Ordina in modo decrescente: dal dipendente con più qualifiche a quello con meno
-      return b.qualifiche.length - a.qualifiche.length;
-    });
-      //////////////////////////////////// STEP 2 ////////////////////////////////
-// Creiamo una matrice vuota per rappresentare la compatibilità tra dipendenti e ruoli (qualifiche)
+   Algoritmo() {
+  // STEP 1: Filtra i dipendenti non assenti e ordinali per competenze
+  const dipendentiNonAssenti = this.allDipendenti.filter(dipendente => !this.dipendentiAssenti.map(d => d.id).includes(dipendente.id));
+  dipendentiNonAssenti.sort((a, b) => b.qualifiche.length - a.qualifiche.length);
+
+  // STEP 2: Creazione della matrice di compatibilità (esempio)
+  const matriceCompatibilita = [];
+  dipendentiNonAssenti.forEach((dipendente) => {
+    const compatibilitaDipendente = [];
+    // ... (popola compatibilitaDipendente con 1 o 0 a seconda delle qualifiche)
+    matriceCompatibilita.push(compatibilitaDipendente);
+  });
+
+  // STEP 3: Assegnazione dei ruoli ai dipendenti
+  const numDipendenti = dipendentiNonAssenti.length;
+  const numRuoli = Object.keys(this.qualificheNecessarie).length;
+  const ruoliDaAssegnare = Object.keys(this.qualificheNecessarie);
+
+  // STEP 3: Creazione della matrice di compatibilità
+
+// Inizializza la matrice di compatibilità
 const matriceCompatibilita = [];
 
-// Per ogni dipendente, creiamo una riga nella matrice di compatibilità
+// Per ciascun dipendente non assente
 dipendentiNonAssenti.forEach((dipendente) => {
   const compatibilitaDipendente = [];
 
-  // Per ciascuna qualifica (ruolo), verifichiamo se il dipendente possiede quella competenza
-  const qualificheDipendente = dipendente.qualifiche; // Supponiamo che 'qualifiche' sia un array contenente le qualifiche del dipendente
-  const qualificheDisponibili = ['BAR', 'SALA', 'CUCINA']; // Elenco delle qualifiche possibili
-
-  qualificheDisponibili.forEach((qualifica) => {
-    // Verifichiamo se il dipendente possiede quella qualifica/ruolo
-    const eCompetente = qualificheDipendente.includes(qualifica);
-
-    // Se il dipendente è competente per la qualifica/ruolo, impostiamo a true (1), altrimenti a false (0)
-    compatibilitaDipendente.push(eCompetente ? 1 : 0);
+  // Per ciascuna qualifica richiesta
+  const qualificheRichieste = Object.keys(qualificheNecessarie); // BAR, SALA, CUCINA
+  qualificheRichieste.forEach((qualifica) => {
+    // Verifica se il dipendente possiede la qualifica richiesta
+    const possiedeQualifica = dipendente.qualifiche.includes(qualifica);
+    
+    // Aggiungi alla matrice un valore che rappresenta la compatibilità del dipendente con la qualifica
+    compatibilitaDipendente.push(possiedeQualifica ? 1 : 0);
   });
 
-  // Aggiungi la riga di compatibilità del dipendente alla matrice
+  // Aggiungi la riga della matrice relativa al dipendente
   matriceCompatibilita.push(compatibilitaDipendente);
 });
-//////////////////////////////////// STEP 3 ////////////////////////////////
+
+// Ora la matriceCompatibilita contiene la compatibilità di ogni dipendente con le qualifiche richieste per i vari ruoli
+console.log('Matrice di compatibilità:', matriceCompatibilita);
 
 
-  },
+  // Implementa l'algoritmo di assegnazione dei ruoli utilizzando i dati sopra e la matriceCompatibilita
+  const tabellaAssegnazione = [];
+  // ...
+
+  // Restituisci eventuali risultati o stato di assegnazione
+  return tabellaAssegnazione;
+}
+
 
   },
 };
