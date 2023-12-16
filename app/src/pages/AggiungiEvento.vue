@@ -107,8 +107,12 @@
 
 
     <!-- Pulsante di conferma -->
-    <button class="button" @click="inviaDatiEvento()">Conferma</button>
+    <button class="button" @click="Algoritmo()">Conferma</button>
     <span v-if="mostraConferma" class="conferma">Evento aggiunto correttamente!</span>
+
+    <!-- Area per visualizzare il messaggio di errore -->
+    <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+
 
     <!-- Spazio per scorrere -->
     <div style="height: 1000px;"></div>
@@ -127,6 +131,7 @@ export default {
       descrizione: "",
       isFesta: false,
       dipendenti: [],
+      errorMessage: '', // Variabile per memorizzare il messaggio di errore
       mostraConferma: false,
       eventi: [],
       clienti: [],
@@ -223,7 +228,7 @@ export default {
         });
       });
 
-      console.log('ID dei Dipendenti Occupati:', JSON.stringify(idDipendentiOccupati));
+      // console.log('ID dei Dipendenti Occupati:', JSON.stringify(idDipendentiOccupati));
 
       const dipendentiPromises = [];
 
@@ -250,7 +255,7 @@ export default {
       Promise.all(dipendentiPromises)
         .then((dipendentiOccupati) => {
           this.dipendentiOccupati = dipendentiOccupati.filter((dipendente) => dipendente !== null);
-          console.log('Dipendenti Occupati:', JSON.stringify(this.dipendentiOccupati));
+          //console.log('Dipendenti Occupati:', JSON.stringify(this.dipendentiOccupati));
 
           // Chiamata a fetchDipendentiDisponibili dopo aver recuperato i dipendenti occupati
           this.fetchDipendentiDisponibili();
@@ -279,10 +284,10 @@ export default {
       })
       .then((eventi) => {
         this.eventi = eventi; // Aggiorna la lista degli eventi con quelli ottenuti dalla chiamata API
-        console.log('Eventi ottenuti:', JSON.stringify(this.eventi, null, 2));
+       // console.log('Eventi ottenuti:', JSON.stringify(this.eventi, null, 2));
 
         // Aggiungi il log finale qui per mostrare il contenuto degli eventi dopo l'aggiornamento
-        console.log('Contenuto degli eventi dopo l\'aggiornamento:', JSON.stringify(this.eventi, null, 2));
+       // console.log('Contenuto degli eventi dopo l\'aggiornamento:', JSON.stringify(this.eventi, null, 2));
       })
       .catch((error) => {
         console.error("Errore durante il recupero degli eventi:", error);
@@ -313,7 +318,7 @@ export default {
   };
 
   // Mostra l'oggetto 'evento' in formato JSON tramite console.log
-  console.log('Dati dell\'evento da inviare:', JSON.stringify(evento));
+ // console.log('Dati dell\'evento da inviare:', JSON.stringify(evento));
 
   const token = sessionStorage.getItem("token");
 
@@ -406,57 +411,83 @@ export default {
   });
    },
    Algoritmo() {
-  // STEP 1: Filtra i dipendenti non assenti e ordinali per competenze
-  const dipendentiNonAssenti = this.allDipendenti.filter(dipendente => !this.dipendentiAssenti.map(d => d.id).includes(dipendente.id));
-  dipendentiNonAssenti.sort((a, b) => b.qualifiche.length - a.qualifiche.length);
+   // Recupera le chiavi (qualifiche) dall'oggetto qualificheNecessarie
+  const qualifiche = Object.keys(this.qualificheNecessarie);
 
-  // STEP 2: Creazione della matrice di compatibilità (esempio)
-  const matriceCompatibilita = [];
-  dipendentiNonAssenti.forEach((dipendente) => {
-    const compatibilitaDipendente = [];
-    // ... (popola compatibilitaDipendente con 1 o 0 a seconda delle qualifiche)
-    matriceCompatibilita.push(compatibilitaDipendente);
+  // Crea un array di oggetti con qualifica e numero di dipendenti richiesti
+  const qualificheConNumeroPersone = qualifiche.map(qualifica => ({
+    qualifica,
+    numeroDipendenti: this.qualificheNecessarie[qualifica]
+  }));
+
+  // Ordina l'array in base al numero di persone richieste per qualifica in ordine decrescente
+  qualificheConNumeroPersone.sort((a, b) => b.numeroDipendenti - a.numeroDipendenti);
+
+  // Genera un array di qualifiche ripetute il numero di volte corrispondente al numero di dipendenti richiesti
+  const arrayQualifiche = [];
+  qualificheConNumeroPersone.forEach(qualifica => {
+    for (let i = 0; i < qualifica.numeroDipendenti; i++) {
+      arrayQualifiche.push(qualifica.qualifica);
+    }
   });
 
-  // STEP 3: Assegnazione dei ruoli ai dipendenti
-  const numDipendenti = dipendentiNonAssenti.length;
-  const numRuoli = Object.keys(this.qualificheNecessarie).length;
-  const ruoliDaAssegnare = Object.keys(this.qualificheNecessarie);
+  // Ora 'arrayQualifiche' contiene le qualifiche ripetute in base al numero di dipendenti necessari
+  console.log('Array di qualifiche ripetute in base al numero di dipendenti richiesti:', arrayQualifiche);
 
-  // STEP 3: Creazione della matrice di compatibilità
 
-// Inizializza la matrice di compatibilità
-const matriceCompatibilita = [];
+  // Chiamata per recuperare i dipendenti disponibili
+  this.fetchDipendentiDisponibili(); 
 
-// Per ciascun dipendente non assente
-dipendentiNonAssenti.forEach((dipendente) => {
-  const compatibilitaDipendente = [];
+// Array con le qualifiche da considerare per il conteggio
+const qualificheConsiderate = ['SALA', 'CUCINA', 'BAR'];
 
-  // Per ciascuna qualifica richiesta
-  const qualificheRichieste = Object.keys(qualificheNecessarie); // BAR, SALA, CUCINA
-  qualificheRichieste.forEach((qualifica) => {
-    // Verifica se il dipendente possiede la qualifica richiesta
-    const possiedeQualifica = dipendente.qualifiche.includes(qualifica);
-    
-    // Aggiungi alla matrice un valore che rappresenta la compatibilità del dipendente con la qualifica
-    compatibilitaDipendente.push(possiedeQualifica ? 1 : 0);
+// Array per contare le qualifiche tra i dipendenti disponibili
+let qualificheCount = {};
+
+// Conteggio delle qualifiche selezionate tra i dipendenti disponibili
+this.dipendentiDisponibili.forEach(dipendente => {
+  dipendente.qualifiche.forEach(qualifica => {
+    if (qualificheConsiderate.includes(qualifica)) {
+      if (!qualificheCount[qualifica]) {
+        qualificheCount[qualifica] = 1;
+      } else {
+        qualificheCount[qualifica]++;
+      }
+    }
   });
-
-  // Aggiungi la riga della matrice relativa al dipendente
-  matriceCompatibilita.push(compatibilitaDipendente);
 });
 
-// Ora la matriceCompatibilita contiene la compatibilità di ogni dipendente con le qualifiche richieste per i vari ruoli
-console.log('Matrice di compatibilità:', matriceCompatibilita);
+// Ora 'qualificheCount' contiene il numero di dipendenti disponibili per SALA, CUCINA e BAR
+console.log('Numero di dipendenti disponibili per SALA, CUCINA e BAR:', qualificheCount);
 
+ // Calcolo degli scarti tra le qualifiche richieste e i dipendenti disponibili
+ const Scarti = {};
+  for (const qualifica in this.qualificheNecessarie) {
+    if (qualificheCount.hasOwnProperty(qualifica)) {
+      Scarti[qualifica] = qualificheCount[qualifica] - this.qualificheNecessarie[qualifica];
+    } else {
+      Scarti[qualifica] = -this.qualificheNecessarie[qualifica];
+    }
+  }
 
-  // Implementa l'algoritmo di assegnazione dei ruoli utilizzando i dati sopra e la matriceCompatibilita
-  const tabellaAssegnazione = [];
-  // ...
+  // Ora 'Scarti' contiene gli scarti tra le qualifiche richieste e i dipendenti disponibili
+  console.log('Scarti tra qualifiche richieste e dipendenti disponibili:', Scarti);
 
-  // Restituisci eventuali risultati o stato di assegnazione
-  return tabellaAssegnazione;
+  const hasNegativeScarti = Object.values(Scarti).some(scarto => scarto < 0);
+
+if (hasNegativeScarti) {
+  this.errorMessage = 'Impossibile allocare questa configurazione';
+  return; // Esci dalla funzione Algoritmo() se ci sono scarti negativi
 }
+
+
+
+
+}
+
+
+
+
 
 
   },
@@ -471,6 +502,13 @@ console.log('Matrice di compatibilità:', matriceCompatibilita);
   width: 100%;
   border-collapse: collapse;
 }
+
+.error-message {
+  margin-top: 10px;
+  color: red;
+  font-weight: bold;
+}
+
 
 .qualifiche-table th,
 .qualifiche-table td {
