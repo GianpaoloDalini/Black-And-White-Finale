@@ -202,23 +202,31 @@ export default {
       }
     },
     fetchDipendentiOccupati() {
-    console.log('Chiamata a fetchDipendentiOccupati()');
+  console.log('Chiamata a fetchDipendentiOccupati()');
 
-    const token = sessionStorage.getItem('token');
-    const formattedDate = this.formatDateForApi(this.date);
+  const token = sessionStorage.getItem('token');
+  const formattedDate = this.formatDateForApi(this.date);
 
-    fetch(`http://localhost:8080/api/v1/eventi/geteventibydate/${formattedDate}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Eventi non trovati');
-      }
-      return response.json();
-    })
-    .then((eventi) => {
+  fetch(`http://localhost:8080/api/v1/eventi/geteventibydate/${formattedDate}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  .then((response) => {
+    if (!response.ok) {
+      // throw new Error('Errore durante il recupero degli eventi');
+      console.log('Nessun evento trovato per la data specificata');
+      this.fetchDipendentiDisponibili();
+      return []; // Restituisce un array vuoto per continuare il flusso
+    }
+    return response.json();
+  })
+  .then((eventi) => {
+    if (eventi.length === 0) {
+      console.log('Nessun evento trovato per la data specificata');
+      // Puoi gestire la situazione senza eventi qui se necessario
+      // Esempio: esegui un'azione predefinita o restituisci un valore vuoto
+    } else {
       const idDipendentiOccupati = [];
 
       eventi.forEach((evento) => {
@@ -227,12 +235,8 @@ export default {
         });
       });
 
-      // console.log('ID dei Dipendenti Occupati:', JSON.stringify(idDipendentiOccupati));
-
-      const dipendentiPromises = [];
-
-      idDipendentiOccupati.forEach((idDipendente) => {
-        const dipendentePromise = fetch(`http://localhost:8080/api/v1/dipendenti/getdipendente/${idDipendente}`, {
+      const dipendentiPromises = idDipendentiOccupati.map((idDipendente) => {
+        return fetch(`http://localhost:8080/api/v1/dipendenti/getdipendente/${idDipendente}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -247,51 +251,54 @@ export default {
           console.error("Errore durante il recupero dei dettagli del dipendente:", error);
           return null;
         });
-
-        dipendentiPromises.push(dipendentePromise);
       });
 
       Promise.all(dipendentiPromises)
         .then((dipendentiOccupati) => {
           this.dipendentiOccupati = dipendentiOccupati.filter((dipendente) => dipendente !== null);
-          //console.log('Dipendenti Occupati:', JSON.stringify(this.dipendentiOccupati));
-
           // Chiamata a fetchDipendentiDisponibili dopo aver recuperato i dipendenti occupati
           this.fetchDipendentiDisponibili();
         });
-    })
-    .catch((error) => {
-      console.error("Errore durante il recupero degli eventi:", error);
-    });
+    }
+  })
+  .catch((error) => {
+    console.error("Errore durante il recupero degli eventi:", error);
+  });
     },
+
     fetchEventiByDate() {
-    console.log('Chiamata a fetchEventiByDate()');
+  console.log('Chiamata a fetchEventiByDate()');
 
-    const token = sessionStorage.getItem('token');
-    const formattedDate = this.formatDateForApi(this.date);
+  const token = sessionStorage.getItem('token');
+  const formattedDate = this.formatDateForApi(this.date);
 
-    fetch(`http://localhost:8080/api/v1/eventi/geteventibydate/${formattedDate}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Eventi non trovati');
-        }
-        return response.json();
-      })
-      .then((eventi) => {
-        this.eventi = eventi; // Aggiorna la lista degli eventi con quelli ottenuti dalla chiamata API
-       // console.log('Eventi ottenuti:', JSON.stringify(this.eventi, null, 2));
-
-        // Aggiungi il log finale qui per mostrare il contenuto degli eventi dopo l'aggiornamento
-       // console.log('Contenuto degli eventi dopo l\'aggiornamento:', JSON.stringify(this.eventi, null, 2));
-      })
-      .catch((error) => {
-        console.error("Errore durante il recupero degli eventi:", error);
-      });
+  fetch(`http://localhost:8080/api/v1/eventi/geteventibydate/${formattedDate}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
+  })
+  .then((response) => {
+    if (!response.ok) {
+      this.eventi = []; // Imposta this.eventi come un array vuoto
+      console.log('Nessun evento trovato per questa data.');
+    }
+    return response.json();
+  })
+  .then((eventi) => {
+    if (eventi && eventi.length > 0) {
+      this.eventi = eventi;
+      console.log('Eventi ottenuti:', JSON.stringify(this.eventi, null, 2));
+    } else {
+      this.eventi = []; // Imposta this.eventi come un array vuoto
+      console.log('Nessun evento trovato per questa data.');
+    }
+  })
+  .catch((error) => {
+    console.error("Errore durante il recupero degli eventi:", error);
+  });
+},
+
+
     inviaDatiEvento() {
   console.log('Chiamata a inviaDatiEvento()');
 
@@ -403,7 +410,13 @@ const dipendentiIDs = this.DipendentiAllocati.map(dipendente => dipendente.id);
 
     // Rimuovi i dipendenti occupati dai dipendenti disponibili
     this.dipendentiDisponibili = this.allDipendenti.filter(
-      (dipendente) => !idDipendentiAssenti.includes(dipendente.id) && !this.dipendentiOccupati.map((d) => d.id).includes(dipendente.id)
+      (dipendente) => {
+        const isDipendenteOccupato = this.dipendentiOccupati.map((d) => d.id).includes(dipendente.id);
+        const hasQualifiche = dipendente.qualifiche && dipendente.qualifiche.length > 0;
+        const isDipendenteAssente = idDipendentiAssenti.includes(dipendente.id);
+
+        return !isDipendenteAssente && !isDipendenteOccupato && hasQualifiche;
+      }
     );
     
     // Output per verificare i dati ottenuti
@@ -413,7 +426,8 @@ const dipendentiIDs = this.DipendentiAllocati.map(dipendente => dipendente.id);
   .catch((error) => {
     console.error("Errore durante il recupero dei dipendenti assenti:", error);
   });
-   },
+},
+
    Algoritmo() {
    // Recupera le chiavi (qualifiche) dall'oggetto qualificheNecessarie
   const qualifiche = Object.keys(this.qualificheNecessarie);
@@ -423,6 +437,9 @@ const dipendentiIDs = this.DipendentiAllocati.map(dipendente => dipendente.id);
     qualifica,
     numeroDipendenti: this.qualificheNecessarie[qualifica]
   }));
+
+   console.log('Qualifiche con numero di persone:', qualificheConNumeroPersone);
+
 
   // Ordina l'array in base al numero di persone richieste per qualifica in ordine decrescente
   qualificheConNumeroPersone.sort((a, b) => b.numeroDipendenti - a.numeroDipendenti);
@@ -434,18 +451,36 @@ const dipendentiIDs = this.DipendentiAllocati.map(dipendente => dipendente.id);
       arrayQualifiche.push(qualifica.qualifica);
     }
   });
+ 
+ console.log('Array di qualifiche:', arrayQualifiche);
 
-  2
 
   // Chiamata per recuperare i dipendenti disponibili
-  this.fetchDipendentiDisponibili(); 
+  //this.fetchDipendentiDisponibili(); 
 
 // Array con le qualifiche da considerare per il conteggio
 const qualificheConsiderate = ['SALA', 'CUCINA', 'BAR'];
 
 // Array per contare le qualifiche tra i dipendenti disponibili
 let qualificheCount = {};
+console.log('Dipendenti Disponibili:', JSON.stringify(this.dipendentiDisponibili, null, 2));
+console.log('sto per for etchare');
 
+if (this.dipendentiDisponibili && Array.isArray(this.dipendentiDisponibili)) {
+  this.dipendentiDisponibili.forEach(dipendente => {
+    if (dipendente && dipendente.qualifiche && Array.isArray(dipendente.qualifiche)) {
+      dipendente.qualifiche.forEach(qualifica => {
+        if (qualificheConsiderate && qualificheConsiderate.includes && qualificheConsiderate.includes(qualifica)) {
+          if (!qualificheCount[qualifica]) {
+            qualificheCount[qualifica] = 1;
+          } else {
+            qualificheCount[qualifica]++;
+          }
+        }
+      });
+    }
+  });
+}
 // Conteggio delle qualifiche selezionate tra i dipendenti disponibili
 this.dipendentiDisponibili.forEach(dipendente => {
   dipendente.qualifiche.forEach(qualifica => {
@@ -459,6 +494,8 @@ this.dipendentiDisponibili.forEach(dipendente => {
   });
 });
 
+  console.log('Conteggio delle qualifiche:', qualificheCount);
+
 // Ora 'qualificheCount' contiene il numero di dipendenti disponibili per SALA, CUCINA e BAR
 console.log('Numero di dipendenti disponibili per SALA, CUCINA e BAR:', qualificheCount);
 
@@ -471,6 +508,8 @@ console.log('Numero di dipendenti disponibili per SALA, CUCINA e BAR:', qualific
       Scarti[qualifica] = -this.qualificheNecessarie[qualifica];
     }
   }
+
+   console.log('Scarti:', Scarti);
 
   // Ora 'Scarti' contiene gli scarti tra le qualifiche richieste e i dipendenti disponibili
   console.log('Scarti tra qualifiche richieste e dipendenti disponibili:', Scarti);
@@ -502,7 +541,7 @@ this.dipendentiDisponibili.sort((a, b) => {
   });
 
    // Mostra l'array dei dipendenti disponibili ordinato in formato JSON
-   // console.log('Array dei dipendenti disponibili ordinato:', JSON.stringify(this.dipendentiDisponibili));
+  console.log('Array dei dipendenti disponibili ordinato:');
 
    for (let i = 0; i < this.dipendentiDisponibili.length; i++) {
     const dipendente = this.dipendentiDisponibili[i];
@@ -532,7 +571,7 @@ this.dipendentiDisponibili.sort((a, b) => {
     // Log per visualizzare DipendentiAllocati in formato JSON
     console.log('DipendentiAllocati:', JSON.stringify(this.DipendentiAllocati));
     // Ora 'arrayQualifiche' contiene le qualifiche ripetute in base al numero di dipendenti necessari
-  console.log('Array di qualifiche ripetute in base al numero di dipendenti richiesti:', arrayQualifiche);
+    console.log('Array di qualifiche ripetute in base al numero di dipendenti richiesti:', arrayQualifiche);
 
   if (arrayQualifiche.length === 0) {
     // Allocazione riuscita, chiamata alla funzione inviaDati e mostra messaggio di successo
