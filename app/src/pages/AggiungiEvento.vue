@@ -40,14 +40,6 @@
       </div>
     </div>
 
-    <!-- Numero di dipendenti -->
-    <div class="form-group">
-      <label for="numeroDipendenti" class="label">Numero di Dipendenti:</label>
-      <div class="input-wrapper">
-        <input type="number" id="numeroDipendenti" class="input" v-model="numeroDipendenti" />
-      </div>
-    </div>
-
     <!-- Tabella delle qualifiche necessarie -->
     <div class="form-group">
       <label class="label">Qualifiche necessarie:</label>
@@ -112,6 +104,9 @@
 
     <!-- Area per visualizzare il messaggio di errore -->
     <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+    <!-- Area per visualizzare il messaggio di errore -->
+    <div v-if="successMessage" class="success-message">{{ successMessage }}</div>
     
 
 
@@ -134,6 +129,7 @@ export default {
       isFesta: false,
       dipendenti: [],
       errorMessage: '', // Variabile per memorizzare il messaggio di errore
+      successMessage: '', // Variabile per memorizzare il messaggio di successo
       mostraConferma: false,
       eventi: [],
       DipendentiAllocati: [], // Aggiungi l'array DipendentiAllocati
@@ -299,14 +295,19 @@ export default {
     inviaDatiEvento() {
   console.log('Chiamata a inviaDatiEvento()');
 
-  // Ottieni il numero di dipendenti specificato nel form
-  const numDipendentiDaSelezionare = this.numeroDipendenti;
-  console.log('Numero dipendenti specificati nel form:', numDipendentiDaSelezionare);
+  // Calcola il numero di dipendenti necessari basandoti sulla somma delle qualifiche richieste
+const qualificheNecessarie = this.qualificheNecessarie;
+let numDipendentiDaSelezionare = 0;
 
-  // Estrai gli ID dei dipendenti selezionati
-  const dipendentiIDs = this.dipendentiDisponibili
-    .slice(0, numDipendentiDaSelezionare)
-    .map(dipendente => dipendente.id); // Supponendo che gli ID siano presenti nella proprietà 'id'
+for (const qualifica in qualificheNecessarie) {
+  numDipendentiDaSelezionare += qualificheNecessarie[qualifica];
+}
+
+console.log('Numero dipendenti basato sulle qualifiche necessarie:', numDipendentiDaSelezionare);
+
+
+ // Estrai gli ID dai dipendenti allocati
+const dipendentiIDs = this.DipendentiAllocati.map(dipendente => dipendente.id);
 
   // Crea l'oggetto 'evento' con i dati raccolti dal form, incluso solo gli ID dei dipendenti
   const evento = {
@@ -316,7 +317,7 @@ export default {
     descrizione: this.descrizione,
     isFesta: this.isFesta,
     dipendenti: dipendentiIDs, // Passa solo gli ID dei dipendenti
-    numeroDipendenti: this.numeroDipendenti,
+    numeroDipendenti: numDipendentiDaSelezionare,
     qualificheNecessarie: this.qualificheNecessarie,
   };
 
@@ -536,6 +537,7 @@ this.dipendentiDisponibili.sort((a, b) => {
   if (arrayQualifiche.length === 0) {
     // Allocazione riuscita, chiamata alla funzione inviaDati e mostra messaggio di successo
     this.mostraConferma = true;
+    this.successMessage = 'Dipendenti allocati con successo!!!';
     this.inviaDatiEvento();
     // Imposta variabile per mostrare messaggio di successo sulla pagina
     this.errorMessage = ''; // Resetta eventuali errori precedenti
@@ -570,6 +572,12 @@ this.dipendentiDisponibili.sort((a, b) => {
 .error-message {
   margin-top: 10px;
   color: red;
+  font-weight: bold;
+}
+
+.success-message {
+  margin-top: 10px;
+  color: green;
   font-weight: bold;
 }
 
