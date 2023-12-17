@@ -112,6 +112,8 @@
 
     <!-- Area per visualizzare il messaggio di errore -->
     <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+    
+
 
 
     <!-- Spazio per scorrere -->
@@ -134,6 +136,7 @@ export default {
       errorMessage: '', // Variabile per memorizzare il messaggio di errore
       mostraConferma: false,
       eventi: [],
+      DipendentiAllocati: [], // Aggiungi l'array DipendentiAllocati
       clienti: [],
       dipendentiDisponibili: [],
       dipendentiOccupati: [],
@@ -431,9 +434,7 @@ export default {
     }
   });
 
-  // Ora 'arrayQualifiche' contiene le qualifiche ripetute in base al numero di dipendenti necessari
-  console.log('Array di qualifiche ripetute in base al numero di dipendenti richiesti:', arrayQualifiche);
-
+  2
 
   // Chiamata per recuperare i dipendenti disponibili
   this.fetchDipendentiDisponibili(); 
@@ -480,6 +481,69 @@ if (hasNegativeScarti) {
   return; // Esci dalla funzione Algoritmo() se ci sono scarti negativi
 }
 
+// Ordinamento dell'array dei dipendenti disponibili
+this.dipendentiDisponibili.sort((a, b) => {
+    // Calcolo del numero di qualifiche per i dipendenti
+    const numQualificheA = a.qualifiche.filter(qualifica => qualificheConsiderate.includes(qualifica)).length;
+    const numQualificheB = b.qualifiche.filter(qualifica => qualificheConsiderate.includes(qualifica)).length;
+
+    // Se i dipendenti hanno un numero diverso di qualifiche, ordina in base al numero di qualifiche
+    if (numQualificheA !== numQualificheB) {
+      return numQualificheA - numQualificheB;
+    } else {
+      // Altrimenti, se hanno lo stesso numero di qualifiche, calcola la somma degli scarti per ciascun dipendente
+      const sommaScartiA = a.qualifiche.reduce((acc, qualifica) => acc + Scarti[qualifica], 0);
+      const sommaScartiB = b.qualifiche.reduce((acc, qualifica) => acc + Scarti[qualifica], 0);
+
+      // Ordina in base alla somma degli scarti
+      return sommaScartiB - sommaScartiA;
+    }
+  });
+
+   // Mostra l'array dei dipendenti disponibili ordinato in formato JSON
+   // console.log('Array dei dipendenti disponibili ordinato:', JSON.stringify(this.dipendentiDisponibili));
+
+   for (let i = 0; i < this.dipendentiDisponibili.length; i++) {
+    const dipendente = this.dipendentiDisponibili[i];
+    
+    // Ciclo su tutte le qualifiche necessarie
+    for (let j = 0; j < arrayQualifiche.length; j++) {
+      const qualifica = arrayQualifiche[j];
+      
+      // Verifica se il dipendente contiene la qualifica richiesta
+      if (dipendente.qualifiche.includes(qualifica)) {
+        // Aggiungi il dipendente agli allocati
+        this.DipendentiAllocati.push(dipendente);
+        
+        // Rimuovi il dipendente dal array dei dipendenti disponibili
+        this.dipendentiDisponibili.splice(i, 1);
+        
+        // Rimuovi la qualifica dal arrayQualifiche
+        arrayQualifiche.splice(j, 1);
+        
+        // Decrementa l'indice per gestire la rimozione corretta dell'elemento
+        i--;
+        break; // Esci dal ciclo delle qualifiche una volta trovata una corrispondenza
+      }
+    }
+  }
+
+    // Log per visualizzare DipendentiAllocati in formato JSON
+    console.log('DipendentiAllocati:', JSON.stringify(this.DipendentiAllocati));
+    // Ora 'arrayQualifiche' contiene le qualifiche ripetute in base al numero di dipendenti necessari
+  console.log('Array di qualifiche ripetute in base al numero di dipendenti richiesti:', arrayQualifiche);
+
+  if (arrayQualifiche.length === 0) {
+    // Allocazione riuscita, chiamata alla funzione inviaDati e mostra messaggio di successo
+    this.mostraConferma = true;
+    this.inviaDatiEvento();
+    // Imposta variabile per mostrare messaggio di successo sulla pagina
+    this.errorMessage = ''; // Resetta eventuali errori precedenti
+  } else {
+    // Allocazione non riuscita, mostra messaggio di errore sulla pagina
+    this.mostraConferma = false;
+    this.errorMessage = 'Allocazione non riuscita';
+  }
 
 
 
