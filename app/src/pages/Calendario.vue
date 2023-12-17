@@ -131,7 +131,7 @@ export default {
       })
         .then(response => {
           if (!response.ok) {
-            throw new Error('Errore durante l\'aggiunta dell\'assenza');
+            throw new Error('Errore durante l'aggiunta dell'assenza');
           }
           this.caricaAssenzeDipendente();
         })
@@ -162,7 +162,7 @@ export default {
       })
         .then(response => {
           if (!response.ok) {
-            throw new Error('Errore durante la rimozione dell\'assenza');
+            throw new Error('Errore durante la rimozione dell'assenza');
           }
           this.caricaAssenzeDipendente();
         })

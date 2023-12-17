@@ -251,7 +251,6 @@ export default {
   },
 
   mounted() {
-    // caricamento dei clienti al caricamento della pagina
     this.caricaClienti();
   },
 };

@@ -286,7 +286,7 @@ export default {
         lingue: lingueSelezionate,
       };
 
-      // Effettua la richiesta POST al server
+      
       const token = sessionStorage.getItem("token");
 
       const requestOptions = {

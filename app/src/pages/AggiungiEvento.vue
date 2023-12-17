@@ -96,8 +96,6 @@
   </div>
 </div>
 
-
-
     <!-- Pulsante di conferma -->
     <button class="button" @click="Algoritmo()">Conferma</button>
     <span v-if="mostraConferma" class="conferma">Evento aggiunto correttamente!</span>
@@ -108,9 +106,6 @@
     <!-- Area per visualizzare il messaggio di errore -->
     <div v-if="successMessage" class="success-message">{{ successMessage }}</div>
     
-
-
-
     <!-- Spazio per scorrere -->
     <div style="height: 1000px;"></div>
   </div>
@@ -128,8 +123,8 @@ export default {
       descrizione: "",
       isFesta: false,
       dipendenti: [],
-      errorMessage: '', // Variabile per memorizzare il messaggio di errore
-      successMessage: '', // Variabile per memorizzare il messaggio di successo
+      errorMessage: '', 
+      successMessage: '', 
       mostraConferma: false,
       eventi: [],
       DipendentiAllocati: [], // Aggiungi l'array DipendentiAllocati
@@ -328,7 +323,6 @@ const dipendentiIDs = this.DipendentiAllocati.map(dipendente => dipendente.id);
     qualificheNecessarie: this.qualificheNecessarie,
   };
 
-  // Mostra l'oggetto 'evento' in formato JSON tramite console.log
  // console.log('Dati dell\'evento da inviare:', JSON.stringify(evento));
 
   const token = sessionStorage.getItem("token");
@@ -408,7 +402,7 @@ const dipendentiIDs = this.DipendentiAllocati.map(dipendente => dipendente.id);
     // Filtra gli allDipendenti escludendo quelli presenti tra i dipendenti assenti
     this.dipendentiAssenti = this.allDipendenti.filter((dipendente) => idDipendentiAssenti.includes(dipendente.id));
 
-    // Rimuovi i dipendenti occupati dai dipendenti disponibili
+    // Rimuovi i dipendenti occupati dai dipendenti diponibili
     this.dipendentiDisponibili = this.allDipendenti.filter(
       (dipendente) => {
         const isDipendenteOccupato = this.dipendentiOccupati.map((d) => d.id).includes(dipendente.id);
@@ -419,7 +413,6 @@ const dipendentiIDs = this.DipendentiAllocati.map(dipendente => dipendente.id);
       }
     );
     
-    // Output per verificare i dati ottenuti
     // console.log('Dipendenti Assenti:', JSON.stringify(this.dipendentiAssenti, null, 2));
     // console.log('Dipendenti Disponibili:', JSON.stringify(this.dipendentiDisponibili, null, 2));
   })
@@ -568,20 +561,20 @@ this.dipendentiDisponibili.sort((a, b) => {
     }
   }
 
-    // Log per visualizzare DipendentiAllocati in formato JSON
+    
     console.log('DipendentiAllocati:', JSON.stringify(this.DipendentiAllocati));
     // Ora 'arrayQualifiche' contiene le qualifiche ripetute in base al numero di dipendenti necessari
     console.log('Array di qualifiche ripetute in base al numero di dipendenti richiesti:', arrayQualifiche);
 
   if (arrayQualifiche.length === 0) {
-    // Allocazione riuscita, chiamata alla funzione inviaDati e mostra messaggio di successo
+
     this.mostraConferma = true;
     this.successMessage = 'Dipendenti allocati con successo!!!';
     this.inviaDatiEvento();
-    // Imposta variabile per mostrare messaggio di successo sulla pagina
+    
     this.errorMessage = ''; // Resetta eventuali errori precedenti
   } else {
-    // Allocazione non riuscita, mostra messaggio di errore sulla pagina
+ 
     this.mostraConferma = false;
     this.errorMessage = 'Allocazione non riuscita';
   }
